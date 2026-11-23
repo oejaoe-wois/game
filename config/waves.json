@@ -1,0 +1,18 @@
+{
+  "_comment": "Precision wave-farming registry: every gate/wave the divers round-robin over. Each entry: path (the active_wave.php query, exactly as the game's wave router wants it), label (shown on the dashboard) and rewardCapLv (the wave's 'Rewards Up To LV X' level gate — past that level the wave drops gear/items but NO exp/gold; the divers' picker sinks such waves to the back for accounts above the cap; 0 = unknown). Live-verified 2026-11: Grakthar wave 1 reads 'Rewards Up To LV 300'. Event waves (event=N&wave=M) are discovered dynamically at sweep time from event_page.php and merged here at runtime — no need to list them. Edit freely — restart the server after. A WAVE_PAGES env var overrides this file; the built-in defaults in server/waves.js are the fallback.",
+  "waves": [
+    { "path": "gate=3&wave=3",  "label": "Grakthar · wave 1",        "rewardCapLv": 300 },
+    { "path": "gate=3&wave=5",  "label": "Grakthar · wave 2",        "rewardCapLv": 0 },
+    { "path": "gate=3&wave=8",  "label": "Grakthar · wave 3",        "rewardCapLv": 0 },
+    { "path": "gate=5&wave=9",  "label": "Olympus · wave 1",         "rewardCapLv": 0 },
+    { "path": "gate=5&wave=10", "label": "Olympus · Hermes domain",  "rewardCapLv": 0 },
+    { "path": "gate=5&wave=11", "label": "Olympus · Artemis domain", "rewardCapLv": 0 },
+    { "path": "gate=5&wave=12", "label": "Olympus · Poseidon domain", "rewardCapLv": 0 },
+    { "path": "gate=5&wave=13", "label": "Olympus · Ares domain",    "rewardCapLv": 0 },
+    { "path": "gate=5&wave=14", "label": "Olympus · Apollo domain",  "rewardCapLv": 0 },
+    { "path": "gate=5&wave=15", "label": "Olympus · Athena domain",  "rewardCapLv": 0 },
+    { "path": "gate=5&wave=16", "label": "Olympus · Hera domain",    "rewardCapLv": 0 },
+    { "path": "gate=5&wave=17", "label": "Olympus · Zeus domain",    "rewardCapLv": 0 },
+    { "path": "event=13&wave=116", "label": "Event · The Dragon Realm", "rewardCapLv": 0 }
+  ]
+}

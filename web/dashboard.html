@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https: http://localhost:* http://127.0.0.1:*; base-uri 'none'; form-action 'none'">
+<title>aio-farm · dashboard</title>
+<link rel="stylesheet" href="css/base.css">
+</head>
+<body>
+<main class="shell">
+
+  <header id="siteHeader"></header>
+
+  <section class="card">
+    <h2>Farm overview <span class="sub">· refreshes every 15 s while the tab is visible</span></h2>
+    <p class="hint">One row per account container. <strong>running</strong> = logged in and working ·
+      <strong>logged_out</strong> = the game ended that session (auto re-login, cooldown applies) ·
+      <strong>error</strong> = the last action failed — read “Last error”. If EXP stops moving or
+      “Last action” goes <span class="stale">quiet</span> for 10+ minutes, hit <em>relogin</em> on the Accounts page.</p>
+    <div class="tiles">
+      <div class="tile"><div class="k">Accounts running</div><div class="v" id="tileRunning">—</div></div>
+      <div class="tile"><div class="k">Total accounts</div><div class="v" id="tileAccounts">—</div></div>
+      <div class="tile"><div class="k">Farm switch</div><div class="v" id="tileFarm">—</div></div>
+      <div class="tile"><div class="k">EXP gained (sum)</div><div class="v" id="tileExp">—</div></div>
+      <div class="tile"><div class="k">Scout last run</div><div class="v" id="tileScout">—</div></div>
+      <div class="tile"><div class="k">Server uptime</div><div class="v" id="tileUptime">—</div></div>
+    </div>
+    <div class="row" style="margin-top:6px">
+      <button id="farmToggle" class="ghost small" data-on="1" hidden>farm: —</button>
+      <div class="meta" id="metaLine" style="margin:0">—</div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Accounts <span class="sub">· add, relogin or remove on the Accounts page</span></h2>
+    <div class="tablewrap">
+      <table id="acctTable">
+        <thead>
+          <tr><th>Account</th><th>Site</th><th>Status</th><th>Lvl</th><th>EXP</th><th>HP · Stam</th><th>Now</th><th>Last action</th></tr>
+        </thead>
+        <tbody id="acctRows"><tr><td colspan="8" class="empty">loading…</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Live boss targets <span class="sub">· what the built-in fetcher is broadcasting right now</span></h2>
+    <div class="meta" id="scoutLine">—</div>
+    <div class="tablewrap">
+      <table id="targetTable">
+        <thead><tr><th>Boss</th><th>Mob ID</th><th>Wave</th><th>Found</th><th>Peek</th></tr></thead>
+        <tbody id="targetRows"><tr><td colspan="5" class="empty">loading…</td></tr></tbody>
+      </table>
+    </div>
+    <div class="row"><a class="chip gold" href="targets.html">open Targets → spawn timers, wave registry &amp; details</a></div>
+  </section>
+
+</main>
+<script src="js/common.js"></script>
+<script src="js/dashboard.js"></script>
+</body>
+</html>

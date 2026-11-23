@@ -1,0 +1,14 @@
+{
+  "name": "aio-farm",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Headless multi-account farm orchestrator (Node port of the All-In-OneUI extension HTTP core). Zero dependencies.",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "test": "node test/unit-test.js && node test/run-test.js && node test/multisite-test.js && node test/multiuser-test.js && node test/dailies-test.js && node test/swarm-test.js && node test/curl-test.js"
+  },
+  "engines": {
+    "node": ">=18.14"
+  }
+}

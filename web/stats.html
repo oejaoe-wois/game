@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https: http://localhost:* http://127.0.0.1:*; base-uri 'none'; form-action 'none'">
+<title>aio-farm · stats</title>
+<link rel="stylesheet" href="css/base.css">
+</head>
+<body>
+<main class="shell">
+
+  <header id="siteHeader"></header>
+
+  <section class="card">
+    <h2>Allocate stat points <span class="sub">· through the game's own stats_ajax.php</span></h2>
+    <p class="hint">The game only accepts chunks of <strong>100 / 50 / 5 / 1</strong> — the engine splits
+      any amount for you and re-syncs its csrf/view tokens automatically when the game answers 409.
+      <strong>Plan</strong> spends fixed amounts; <strong>Targets</strong> keeps spending every banked point
+      until each attribute reaches its goal (attack first, then defense, then stamina).</p>
+
+    <div class="row" style="margin:0 0 12px">
+      <label class="sitepick" style="margin:0">Mode
+        <select id="statMode" class="statselect" style="min-width:160px">
+          <option value="plan">Plan (fixed amounts)</option>
+          <option value="targets">Targets (spend up to goals)</option>
+        </select>
+      </label>
+      <label class="sitepick" style="margin:0">Account
+        <select id="statAccount" class="statselect" style="min-width:200px"><option value="">oldest healthy account</option></select>
+      </label>
+    </div>
+
+    <div id="planFields">
+      <div class="grid3">
+        <label>Attack points
+          <input id="statAttack" type="number" min="0" step="1" placeholder="0" autocomplete="off">
+        </label>
+        <label>Defense points
+          <input id="statDefense" type="number" min="0" step="1" placeholder="0" autocomplete="off">
+        </label>
+        <label>Stamina points
+          <input id="statStamina" type="number" min="0" step="1" placeholder="0" autocomplete="off">
+        </label>
+      </div>
+    </div>
+
+    <div id="targetFields" hidden>
+      <div class="grid3">
+        <label>Attack goal
+          <input id="tgtAttack" type="number" min="0" step="1" placeholder="0" autocomplete="off">
+        </label>
+        <label>Defense goal
+          <input id="tgtDefense" type="number" min="0" step="1" placeholder="0" autocomplete="off">
+        </label>
+        <label>Stamina goal
+          <input id="tgtStamina" type="number" min="0" step="1" placeholder="0" autocomplete="off">
+        </label>
+      </div>
+    </div>
+
+    <div class="row">
+      <button id="btnAllocate" class="primary">Allocate</button>
+      <span id="statMsg" class="msg"></span>
+    </div>
+    <div class="meta" id="statMeta" style="margin-top:10px">—</div>
+  </section>
+
+  <section class="card">
+    <h2>Per-account stats <span class="sub">· banked points + attributes, refreshed every 15 s</span></h2>
+    <div class="tablewrap">
+      <table id="statTable">
+        <thead><tr><th>Account</th><th>Status</th><th>Banked points</th><th>Attack</th><th>Defense</th><th>Max stamina</th></tr></thead>
+        <tbody id="statRows"><tr><td colspan="6" class="empty">loading…</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+
+</main>
+<script src="js/common.js"></script>
+<script src="js/stats.js"></script>
+</body>
+</html>

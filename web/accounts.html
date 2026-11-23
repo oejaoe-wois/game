@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https: http://localhost:* http://127.0.0.1:*; base-uri 'none'; form-action 'none'">
+<title>aio-farm · accounts</title>
+<link rel="stylesheet" href="css/base.css">
+</head>
+<body>
+<main class="shell">
+
+  <header id="siteHeader"></header>
+
+  <section class="card">
+    <h2>Add a game account <span class="sub">· one cookie-jar container per account</span></h2>
+    <p class="hint">Credentials travel straight to the farm server and are stored <strong>AES-256-GCM
+      encrypted</strong> — the server never returns them, not even masked passwords. Re-adding an email
+      you already added = “fix my password”. The <strong>guild code</strong> (your guild's tag, name or
+      numeric id) makes the worker verify the account's guild before every guild-dungeon run — an
+      account only ever attacks its own guild's mobs, and a wrong code stops the dungeon farm with a
+      clear audit entry. The <strong>dive targets</strong> turn the account into a DIVER: it hunts the
+      named mobs first on every gate/wave/event page it sweeps (comma-separated, e.g.
+      “goblin skirmisher, troll ravager” — with DIVE_ONLY=1 it hunts <em>only</em> those).</p>
+    <form id="addForm">
+      <div class="grid3">
+        <label>Nickname
+          <input id="accNick" type="text" maxlength="40" placeholder="hunter-02" autocomplete="off">
+        </label>
+        <label>Game email
+          <input id="accEmail" type="email" placeholder="you@example.com" autocomplete="off">
+        </label>
+        <label>Game password
+          <div class="pwwrap">
+            <input id="accPass" type="password" placeholder="••••••••" autocomplete="new-password">
+            <button type="button" class="ghost" id="togglePass">show</button>
+          </div>
+        </label>
+      </div>
+      <div class="row">
+        <label class="sitepick">Game site
+          <select id="accSite" class="statselect"><option value="demonic">Demonic Scans</option></select>
+        </label>
+        <label class="sitepick">Guild code <span class="hint">optional · tag, name or id</span>
+          <input id="accGuild" type="text" maxlength="64" placeholder="[DA] · Dagorath Alliance · 32" autocomplete="off"
+                 style="min-width:240px">
+        </label>
+        <label class="sitepick">Class pick <span class="hint">permanent in-game</span>
+          <select id="accClass" class="statselect">
+            <option value="">auto — optimal at lvl 200</option>
+            <option value="mage">Mage (best PvE)</option>
+            <option value="warrior">Warrior</option>
+            <option value="hunter">Hunter</option>
+            <option value="cleric">Cleric</option>
+            <option value="off">off — never pick</option>
+          </select>
+        </label>
+        <label class="sitepick">Dive targets <span class="hint">the mobs this diver hunts first</span>
+          <input id="accDive" type="text" maxlength="300" autocomplete="off" style="min-width:260px"
+                 placeholder="goblin skirmisher, troll ravager">
+        </label>
+        <button type="submit" class="primary" id="btnAdd">Add account</button>
+        <span id="addMsg" class="msg"></span>
+      </div>
+    </form>
+  </section>
+
+  <section class="card">
+    <h2>Your accounts <span class="sub">· refreshes every 15 s while the tab is visible</span></h2>
+    <div class="tablewrap">
+      <table id="acctTable">
+        <thead>
+          <tr><th>Nickname</th><th>Site</th><th>Email</th><th>Guild</th><th>Class</th><th>Status</th><th>Lvl</th><th>EXP gained</th>
+              <th>Points</th><th>HP · Stam</th><th>Hits</th><th>Now</th><th>Last action</th><th>Last error</th><th></th></tr>
+        </thead>
+        <tbody id="acctRows"><tr><td colspan="15" class="empty">loading…</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Potion-shop sweep <span class="sub">· merchant → guild → Damon's, one account</span></h2>
+    <p class="hint">When stamina is low the worker can already sweep every stamina potion the gold/points
+      can carry (POTION_BUY=1). This button runs the same buy-all right now on the account you pick.</p>
+    <div class="row" style="margin-top:0">
+      <select id="shopAccount" class="statselect" style="min-width:220px"><option value="">oldest healthy account</option></select>
+      <button id="btnShop" class="primary">Buy stamina potions</button>
+      <span id="shopMsg" class="msg"></span>
+    </div>
+  </section>
+
+</main>
+<script src="js/common.js"></script>
+<script src="js/accounts.js"></script>
+</body>
+</html>

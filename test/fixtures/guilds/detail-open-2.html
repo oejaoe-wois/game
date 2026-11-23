@@ -1,0 +1,2440 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Guild Directory | Veyra</title><link rel="stylesheet" href="/assets/guilds/directory.css?v=20261004"><script defer src="/assets/guilds/directory.js?v=20261004"></script></head>
+<body class="guild-directory-page"><style>
+  /* Push page content below fixed bar */
+  body { padding-top: 74px; }
+
+  .game-topbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 9999;
+    background: rgba(18,18,18,0.95);
+    backdrop-filter: blur(6px);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+
+  }
+  .gtb-inner{
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    color: #f1f1f1;
+    font-family: Arial, sans-serif;
+  }
+  .gtb-left, .gtb-right{
+    display: flex; align-items: center; gap: 12px;
+  }
+  .gtb-stat{
+    display: inline-flex; align-items: center; gap: 5px;
+    background: #1e1e1e;
+    border: 1px solid #2a2a2a;
+    border-radius: 10px;
+    padding: 6px 7px;
+    font-size: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+  }
+  .gtb-mail-notice{position:absolute;top:calc(100% + 8px);right:14px;display:inline-flex;align-items:center;gap:6px;padding:6px 9px;border:1px solid #a983405c;border-radius:9px;background:linear-gradient(120deg,#302819,#211d16);color:#f2d591!important;text-decoration:none!important;font-size:12px;font-weight:700;white-space:nowrap;box-shadow:0 3px 16px #0006}
+  .gtb-mail-notice:hover{border-color:#d2ad60;background:#362b19}
+  .gtb-mail-count{margin-left:auto;padding:1px 7px;border-radius:20px;background:#b28a3a;color:#0e0d0a;font-size:11px;font-weight:800}
+  .gtb-icon{ opacity: 0.9 }
+  .gtb-label{ color:#cfcfcf; margin-right: 4px }
+  .gtb-value{ font-weight: 700 }
+
+  .gtb-level{
+    background:#262626; border:1px solid #2f2f2f;
+    padding: 6px 10px; border-radius: 10px; font-weight: 700; font-size:14px;
+  }
+  .gtb-exp{ display:flex; flex-direction: column; gap: 6px; min-width: 240px }
+  .gtb-exp-top{ display:flex; justify-content: space-between; font-size:12px; color:#cfcfcf }
+  .gtb-exp-bar{
+    height: 10px; border-radius: 999px; overflow: hidden;
+    background: #2a2a2a; border: 1px solid #333;
+    width: 100%;
+  }
+  .gtb-exp-fill{
+    height: 100%;
+    background: linear-gradient(90deg, #4caf50, #8bc34a);
+    width: 0%;
+    transition: width 0.3s ease;
+  }
+
+  /* Mobile */
+  @media (max-width: 600px){
+    body { padding-top: 100px; }
+    .gtb-inner{ flex-direction: column; align-items: stretch; gap: 8px }
+    .gtb-left{ justify-content: space-between; flex-wrap: wrap }
+    .gtb-exp{ min-width: 100% }
+  }
+  /* --- Mobile EXP bar fix (place after existing CSS) --- */
+.gtb-right { min-width: 0; }           /* allow shrinking */
+.gtb-exp   { min-width: 0; flex: 1; }  /* let bar use available space */
+.gtb-inner { box-sizing: border-box; } /* accurate width calc */
+
+@media (max-width: 600px){
+  .gtb-inner { gap: 8px; padding: 8px 10px; }
+  .gtb-left  { width: 100%; justify-content: space-between; flex-wrap: wrap; }
+  .gtb-right { width: 100%; gap: 8px; align-items: stretch; }
+  .gtb-level { flex: 0 0 auto; }       /* size to content */
+  .gtb-exp   { width: 100%; }          /* bar spans full width */
+  .gtb-exp-top { font-size: 11px; }    /* tighter label on small screens */
+}
+
+/* optional: keep large numbers from stretching stat chips */
+.gtb-stat .gtb-value { white-space: nowrap; }
+.gtb-timer {
+  margin-left: 6px;
+  padding: 2px 6px;
+  border-radius: 8px;
+  background: #243b1f;
+  border: 1px solid #2f5d28;
+  font-size: 11px;
+  color: #cfeccc;
+  white-space: nowrap;
+}
+@media (max-width: 600px){
+  .gtb-left { gap: 1px; }         /* tighter spacing */
+  .gtb-stat {
+    font-size: 11.5px;
+    padding: 3px 3px;
+  }
+
+}
+
+.gtb-value.mono { font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; }
+/* Mobile: add vertical space between wrapped rows and center the time chip */
+
+@media (max-width: 600px){
+  .gtb-left{
+    /* vertical space between wrapped rows */
+    row-gap: 10px;
+    /* keep horizontal spacing tidy (override any previous gap) */
+    column-gap: 6px;
+  }
+
+  .gtb-stat.time-chip{
+    flex: 0 0 auto !important; /* don't stretch / no 100% width */
+    width: auto !important;
+    /* optional: small left/right auto-margins won't force full width */
+    margin-left: 0;
+    margin-right: 0;
+  }
+}
+/* --- Compact one-line stats on small phones --- */
+.gtb-stat { white-space: nowrap; }          /* prevent internal wrapping */
+
+@media (max-width: 600px){
+  .gtb-left{
+    justify-content: flex-start !important; /* don't space-between; we need tight packing */
+    flex-wrap: nowrap !important;           /* force one line */
+    gap: 8px;                               /* slightly tighter */
+  }
+}
+
+@media (max-width: 420px){
+  .gtb-left{ gap: 3px; }
+  .gtb-stat{
+    padding: 2px 3px;
+    font-size: 11px;
+  }
+  /* Hide labels to save width; icons + numbers are enough */
+  .gtb-left .gtb-label{ display: none; }
+  /* Slim timer styling to fit */
+  .gtb-timer{
+    padding: 0 4px;
+    font-size: 10px;
+    background: transparent;
+    border: 0;
+  }
+}
+
+@media (max-width: 340px){
+  .gtb-stat{
+    padding: 1px 2px;
+    font-size: 10px;
+  }
+  /* If you STILL see wrapping on ultra-narrow devices,
+     uncomment the next line to hide the timer text entirely */
+  /* #stamina_timer{ display:none; } */
+}
+
+/* Buffs button (compact) */
+.gtb-buffs-btn{
+  display:inline-flex; align-items:center; gap:6px;
+  background:#1e1e1e; border:1px solid #2a2a2a; color:#fff;
+  border-radius:10px; padding:6px 8px; font-size:12px; cursor:pointer;
+}
+.gtb-badge{
+  background:#2f6f2f; border:1px solid #3b8a3b; color:#cfeccc;
+  border-radius:999px; padding:0 6px; font-size:11px; line-height:16px;
+}
+
+@media (max-width: 420px){
+ 
+  .gtb-buffs-btn{
+    padding: 2px 3px;
+    font-size: 10px;
+  }
+  .gtb-badge{
+    padding: 0px 3px;
+    font-size: 10px;
+  }
+}
+  @media (max-width: 340px){
+  .gtb-buffs-btn{
+    padding: 1px 2px;
+    font-size: 9px;
+  }
+  .gtb-badge{
+    padding: 0px 6px;  
+    font-size: 9px;
+  }
+}
+/* Buffs modal */
+.buffs-modal{
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.6);
+  display: none;                /* default hidden */
+  align-items: center;          /* vertical center */
+  justify-content: center;      /* horizontal center */
+  min-height: 100dvh;           /* mobile-safe viewport height */
+  padding: 16px;                /* keep dialog off screen edges */
+  z-index: 10000;
+}
+.buffs-modal.open{ display:flex; }
+.buffs-dialog{
+  width:min(560px, 92vw); background:#171923; color:#E0E0E0; border:1px solid #2B2D44;
+  border-radius:12px; padding:14px; box-shadow:0 10px 30px rgba(0,0,0,.4);max-height: 90dvh;
+}
+.buffs-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+.buffs-close{ background:#2a2d44; border:0; color:#fff; padding:6px 10px; border-radius:8px; cursor:pointer; }
+.buff-list{ display:flex; flex-direction:column; gap:8px; max-height:60vh; overflow:auto; }
+.buff-row{ display:flex; align-items:center; gap:10px; background:#12131a; border:1px solid #232437; border-radius:10px; padding:10px; }
+.buff-ico{ font-size:18px; }
+.buff-info{ flex:1; min-width:0; }
+.buff-name{ font-weight:600; color:#F1F2FA; }
+.buff-desc{ color:#B9BBD1; font-size:12px; }
+.buff-ends{ font-size:12px; color:#9ad39a; white-space:nowrap; }
+@media (max-width: 600px){
+  .gtb-buffs-btn{
+    padding:2px 2px;
+  }
+}
+
+/* === SIDE DRAWER === */
+.side-drawer{
+  position:fixed;
+  top:0;
+  left:0;
+  bottom:0;
+  z-index:10001; /* just under topbar (9999) so topbar sits above */
+  display:flex;
+  pointer-events:none;          /* closed by default */
+  font-family:Arial,sans-serif;
+}
+.side-drawer[data-open="true"]{
+  pointer-events:auto;
+}
+
+/* overlay for mobile */
+.side-overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.5);
+  opacity:0;
+  transition:opacity .18s ease;
+  display:none;
+}
+.side-drawer[data-open="true"] .side-overlay{
+  display:block;
+  opacity:1;
+}
+
+/* panel */
+.side-drawer-inner{
+  background:#0f1017;
+  border-right:1px solid rgba(255,255,255,0.06);
+  box-shadow:8px 0 24px rgba(0,0,0,.6);
+  color:#fff;
+  width:220px;
+  max-width:80vw;
+  height:100%;
+  display:flex;
+  flex-direction:column;
+  transform:translateX(-240px);
+  transition:transform .18s ease;
+  position:relative;
+  z-index:1;
+  padding:12px;
+}
+.side-drawer[data-open="true"] .side-drawer-inner{
+  transform:translateX(0);
+}
+
+/* header */
+.side-head{
+  margin-bottom:16px;
+}
+.side-title{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  font-size:14px;
+  font-weight:700;
+  color:#f1f1f1;
+  margin-bottom:12px;
+}
+.side-close-btn{
+  background:#1e1f2c;
+  border:1px solid #2b2d44;
+  color:#fff;
+  border-radius:8px;
+  padding:4px 8px;
+  font-size:12px;
+  cursor:pointer;
+}
+@media(min-width:801px){
+  /* On desktop we keep drawer always open and hide the X */
+  .side-close-btn{ display:none; }
+}
+
+/* user mini card */
+.small-user{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  background:#1a1b25;
+  border:1px solid #2b2d44;
+  border-radius:10px;
+  padding:8px 10px;
+  box-shadow:0 6px 16px rgba(0,0,0,.4);
+  font-size:12px;
+}
+.small-ava{
+  width:36px;
+  height:36px;
+  border-radius:8px;
+  overflow:hidden;
+  background:#232437;
+  border:1px solid rgba(255,255,255,.08);
+  flex-shrink:0;
+}
+.small-ava img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+}
+.small-user-meta{
+  min-width:0;
+  color:#f1f1f1;
+  line-height:1.2;
+}
+.small-name{
+  font-weight:700;
+  font-size:13px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.small-level{
+  font-size:11px;
+  color:#9aa0b8;
+}
+
+/* nav list */
+.side-nav{
+  flex:1 1 auto;
+  overflow-y:auto;
+  margin-bottom:16px;
+  padding-right:4px;
+}
+.side-nav::-webkit-scrollbar{
+  width:4px;
+}
+.side-nav::-webkit-scrollbar-track{
+  background:#0f1017;
+}
+.side-nav::-webkit-scrollbar-thumb{
+  background:#2b2d44;
+  border-radius:3px;
+}
+
+.side-nav-item{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  text-decoration:none;
+  color:#d5d9f5;
+  background:#1a1b25;
+  border:1px solid #2b2d44;
+  border-radius:10px;
+  padding:9px 10px;
+  font-size:13px;
+  font-weight:600;
+  line-height:1.3;
+  margin-bottom:8px;
+  box-shadow:0 4px 12px rgba(0,0,0,.4);
+  transition:background .12s ease, box-shadow .12s ease;
+}
+.side-nav-item:hover{
+  background:#22233a;
+  box-shadow:0 6px 16px rgba(0,0,0,.6);
+}
+.side-nav-item.active{
+  background:linear-gradient(180deg,#5562ff,#3b48ee);
+  border-color:rgba(255,255,255,.18);
+  color:#fff;
+  box-shadow:0 10px 22px rgba(59,72,238,.4);
+}
+.side-icon{
+  font-size:14px;
+  line-height:1;
+  width:18px;
+  text-align:center;
+}
+.side-label{
+  flex:1;
+  min-width:0;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+/* footer stats */
+.side-footer{
+  border-top:1px solid #2b2d44;
+  padding-top:12px;
+  font-size:12px;
+  color:#cfcfe6;
+}
+.side-stats-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-bottom:10px;
+}
+.side-chip{
+  background:#1e1f2c;
+  border:1px solid #2b2d44;
+  border-radius:8px;
+  padding:4px 6px;
+  font-weight:700;
+  font-size:11px;
+  color:#fff;
+  line-height:1.2;
+  white-space:nowrap;
+}
+.side-exp-row{}
+.side-exp-top{
+  display:flex;
+  justify-content:space-between;
+  font-size:11px;
+  color:#9aa0b8;
+  margin-bottom:4px;
+}
+.side-exp-bar{
+  height:8px;
+  border-radius:999px;
+  overflow:hidden;
+  background:#2a2a2a;
+  border:1px solid #333;
+}
+.side-exp-fill{
+  height:100%;
+  background:linear-gradient(90deg,#4caf50,#8bc34a);
+  width:0%;
+}
+
+/* hamburger button in topbar */
+.nav-toggle-btn{
+  background:#1e1e1e;
+  border:1px solid #2a2a2a;
+  border-radius:8px;
+  color:#fff;
+  font-size:14px;
+  font-weight:700;
+  padding:6px 10px;
+  line-height:1;
+  cursor:pointer;
+  box-shadow:0 2px 6px rgba(0,0,0,.4);
+}
+
+/* ===== Responsive behavior ===== */
+
+
+@media(min-width:801px){
+  .side-overlay{
+    display:block !important;    /* keep it in the DOM so it can catch clicks */
+    background:transparent !important; /* no dark dimmer on desktop */
+    cursor:default;
+  }
+}
+
+
+@media(max-width:800px){
+  body{
+    padding-left:0;
+  }
+}
+/* ✅ QUICK SETS DRAWER (similar to battle drawer) */
+.quickset-drawer-trigger {
+  position:fixed;
+  right:120px;             /* horizontally aligned with potions button */
+  bottom:17px;             /* same vertical as potions */
+  z-index:10001;
+  background:#24263a;
+  border:1px solid #2f324d;
+  box-shadow:0 10px 24px rgba(0,0,0,.6);
+  border-radius:12px;
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  line-height:1;
+  cursor:pointer;
+  font-weight:700;
+  font-size:14px;
+  line-height:1.2;
+  padding:10px 12px;
+  gap:6px;
+}
+.quickset-drawer-trigger:active { transform:scale(.97); }
+
+#qsDrawerBackdrop {
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.6);
+  z-index:10000;
+  display:none;
+}
+
+/* slide-out panel */
+#qsDrawer {
+  position:fixed;
+  top:0;
+  right:-280px; /* hidden by default */
+  width:260px;
+  max-width:80vw;
+  height:100vh;
+  background:#1a1b25;
+  border-left:1px solid #2f324d;
+  box-shadow:0 0 30px rgba(0,0,0,.8);
+  z-index:10002;
+  padding:16px;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  transition:right .25s ease;
+  color:#fff;
+  font-family:Arial,sans-serif;
+}
+
+body.qsdrawer-open #qsDrawer {
+  right:0;
+}
+body.qsdrawer-open #qsDrawerBackdrop {
+  display:block;
+}
+
+.qs-drawer-head {
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+}
+.qs-drawer-head .title {
+  font-size:15px;
+  font-weight:800;
+  color:#fff;
+}
+.qs-drawer-head .subtitle {
+  font-size:12px;
+  color:#9aa0b8;
+  line-height:1.4;
+}
+.qs-drawer-close {
+  background:none;
+  border:none;
+  color:#cfd4ff;
+  font-size:18px;
+  padding:4px 6px;
+  cursor:pointer;
+  line-height:1;
+}
+.qs-drawer-close:hover { color:#fff; }
+
+.qs-list {
+  list-style:none;
+  margin:0;
+  padding:0;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  flex:1 1 auto;
+  overflow-y:auto;
+}
+
+/* Each list item is a horizontal row with two buttons */
+.qs-item {
+  padding:0;
+  margin:0;
+  display:flex;
+  gap:6px;
+}
+
+/* Each button grows evenly */
+.qs-set-btn {
+  flex:1 1 0;
+  background:#171923;
+  border:1px solid #24263a;
+  border-radius:10px;
+  padding:10px 10px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  font-size:13px;
+  font-weight:700;
+  color:#e0e4ff;
+  cursor:pointer;
+  box-shadow:0 6px 16px rgba(0,0,0,.4);
+}
+.qs-set-btn:hover {
+  background:#1f2130;
+}
+
+/* Optional slight color nuance for types */
+.qs-set-btn.qs-set-eq {
+  border-color:#3d4d7a;
+}
+.qs-set-btn.qs-set-pets {
+  border-color:#3a6b3a;
+}
+
+.qs-set-icon {
+  font-size:16px;
+}
+.qs-set-number {
+  font-size:13px;
+}
+
+
+/* ✅ Modal for choosing attack/defense/cancel */
+.qs-modal-backdrop {
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.6);
+  z-index:10020;
+  display:none;
+}
+.qs-modal {
+  position:fixed;
+  inset:0;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:10021;
+}
+body.qsmodal-open #qsModalBackdrop,
+body.qsmodal-open #qsModal {
+  display:flex;
+}
+
+.qs-modal-dialog {
+  width:min(360px, 92vw);
+  background:#171923;
+  border:1px solid #232437;
+  border-radius:12px;
+  padding:16px 18px;
+  box-shadow:0 16px 40px rgba(0,0,0,.5);
+  color:#e0e4ff;
+  font-family:Arial,sans-serif;
+}
+.qs-modal-title {
+  font-size:15px;
+  font-weight:800;
+  margin-bottom:8px;
+}
+.qs-modal-text {
+  font-size:13px;
+  color:#c0c4e4;
+  margin-bottom:14px;
+}
+.qs-modal-actions {
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+.qs-modal-btn {
+  width:100%;
+  border-radius:8px;
+  padding:8px 10px;
+  font-size:13px;
+  font-weight:700;
+  cursor:pointer;
+  border:1px solid transparent;
+}
+.qs-modal-attack {
+  background:#4b5ef5;
+  border-color:#4b5ef5;
+  color:#fff;
+}
+.qs-modal-defense {
+  background:#2a2b3a;
+  border-color:#3b3d55;
+  color:#e0e4ff;
+}
+.qs-modal-cancel {
+  background:#191a23;
+  border-color:#2a2b3a;
+  color:#c0c4e4;
+}
+.qs-modal-btn:disabled {
+  opacity:.6;
+  cursor:not-allowed;
+}
+
+
+
+</style>
+<!-- === SIDE NAV DRAWER === -->
+<div class="side-drawer" id="sideDrawer" data-open="false">
+  <div class="side-drawer-inner">
+    <div class="side-head">
+      <div class="side-title">
+        <span class="side-game-title">⚡ Veyra Game</span>
+        <button class="side-close-btn" id="sideCloseBtn" aria-label="Close menu">✕</button>
+      </div>
+      <a href="player.php?pid=187959" style="text-decoration:none;"><div class="small-user">
+        <div class="small-ava">
+          <img src="images/userpics/midoriya.webp" alt="" />
+        </div>
+        <div class="small-user-meta">
+          <div class="small-name">diver-3</div>
+          <div class="small-level">LV 319</div>
+        </div>
+      </div></a>
+    </div>
+
+    <nav class="side-nav">
+              <a
+          class="side-nav-item"
+          href="/game_mail.php"
+        >
+          <span class="side-icon">&#9993;</span>
+          <span class="side-label">Mail</span>
+                  </a>
+              <a
+          class="side-nav-item"
+          href="/game_dash.php"
+        >
+          <span class="side-icon">🏠</span>
+          <span class="side-label">Home</span>
+                  </a>
+              <a
+          class="side-nav-item"
+          href="/event_page.php?event=7"
+        >
+          <span class="side-icon">🔥</span>
+          <span class="side-label">Emberfall Event</span>
+                  </a>
+              <a
+          class="side-nav-item"
+          href="/pvp.php"
+        >
+          <span class="side-icon">⚔️</span>
+          <span class="side-label">PvP</span>
+                  </a>
+              <a
+          class="side-nav-item"
+          href="/inventory.php"
+        >
+          <span class="side-icon">🎒</span>
+          <span class="side-label">Inventory</span>
+                  </a>
+              <a
+          class="side-nav-item"
+          href="/power_crystals.php"
+        >
+          <span class="side-icon">💎</span>
+          <span class="side-label">Power Crystals</span>
+                  </a>
+              <a
+          class="side-nav-item"
+          href="/pets.php"
+        >
+          <span class="side-icon">🐾</span>
+          <span class="side-label">Pets</span>
+                  </a>
+              <a
+          class="side-nav-item"
+          href="/stats.php"
+        >
+          <span class="side-icon">📊</span>
+          <span class="side-label">Stats</span>
+                  </a>
+              <a
+          class="side-nav-item"
+          href="/guild_dash.php"
+        >
+          <span class="side-icon">🏰</span>
+          <span class="side-label">Guild</span>
+                  </a>
+              <a
+          class="side-nav-item active"
+          href="/guild_join_create.php"
+        >
+          <span class="side-icon">&#9873;</span>
+          <span class="side-label">Browse Guilds</span>
+                  </a>
+              <a
+          class="side-nav-item"
+          href="/adventurers_guild.php"
+        >
+          <span class="side-icon">✨</span>
+          <span class="side-label">Adventure Guild</span>
+                  </a>
+              <a
+          class="side-nav-item"
+          href="/merchant.php"
+        >
+          <span class="side-icon">🛒</span>
+          <span class="side-label">Merchant</span>
+                  </a>
+              <a
+          class="side-nav-item"
+          href="/blacksmith.php"
+        >
+          <span class="side-icon">⚒️</span>
+          <span class="side-label">Blacksmith</span>
+                  </a>
+              <a
+          class="side-nav-item"
+          href="/collections.php"
+        >
+          <span class="side-icon">📚</span>
+          <span class="side-label">Collections</span>
+                  </a>
+              <a
+          class="side-nav-item"
+          href="/achievements.php"
+        >
+          <span class="side-icon">🏆</span>
+          <span class="side-label">Achievements</span>
+                  </a>
+              <a
+          class="side-nav-item"
+          href="/battle_pass.php"
+        >
+          <span class="side-icon">🎟️</span>
+          <span class="side-label">Battle Pass</span>
+                  </a>
+          </nav>
+
+    <div class="side-footer">
+      <a class="side-nav-item" href="/game_logout.php" style="border-color:#bd8b6655;color:#f1d0ae"><span class="side-icon" aria-hidden="true">&#8618;</span><span class="side-label">Log out</span></a>
+      <div class="side-stats-row">
+        <div class="side-chip">
+          💪 <span>1,298</span>/<span>1,400</span>
+        </div>
+        <div class="side-chip">
+          🪙 <span>1269.92K</span>
+        </div>
+        <div class="side-chip">
+          💎 <span>2.392K</span>
+        </div>
+      </div>
+      <div class="side-exp-row">
+        <div class="side-exp-top">
+          <span>LV 319</span>
+          <span>345,634/640,100</span>
+        </div>
+        <div class="side-exp-bar">
+          <div class="side-exp-fill" style="width: 53%;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- tap-to-close overlay for mobile -->
+  <div class="side-overlay" id="sideOverlay"></div>
+</div>
+<!-- === /SIDE NAV DRAWER === -->
+
+<div class="game-topbar">
+  <div class="gtb-inner">
+    <div class="gtb-left">
+      <div class="gtb-stat">
+  <span class="gtb-icon">💪</span>
+  <span class="gtb-label">Stamina</span>
+  <span class="gtb-value">
+    <span id="stamina_span">1,298</span> / 1,400  </span>
+  <span id="stamina_timer" class="gtb-timer" title="Next +49 at the top of the hour"></span>
+
+</div>
+
+      <div class="gtb-stat"><span class="gtb-icon">🪙</span><span class="gtb-label">Gold</span><span class="gtb-value">1269.92K</span></div>
+      <div class="gtb-stat"><span class="gtb-icon">💎</span><span class="gtb-label">Gems</span><span class="gtb-value">2.392K</span></div>
+      <div class="gtb-stat time-chip"><span class="gtb-icon">🕒</span><span class="gtb-label">Server</span><span class="gtb-value mono" id="server_time" data-epoch="1795380277" data-tzoff="19800" title="Server time">02:14:37 AM</span>
+</div>
+
+<!-- Buffs button (compact) -->
+<button class="gtb-buffs-btn" id="buffs_btn" title="Active Buffs">
+  🧪 <span class="gtb-label">Buffs</span>
+</button>
+    </div>
+
+    <div class="gtb-right">
+      <div class="gtb-level">LV 319</div>
+      <div class="gtb-exp">
+        <div class="gtb-exp-top">
+          <span>EXP&nbsp;</span>
+          <span>345,634 / 640,100</span>
+        </div>
+        <div class="gtb-exp-bar">
+          <div class="gtb-exp-fill" style="width: 53%;"></div>
+        </div>
+      </div>
+    </div>
+  
+
+  </div>
+    
+
+  <!-- Buffs Modal -->
+<div class="buffs-modal" id="buffs_modal" aria-hidden="true">
+  <div class="buffs-dialog" role="dialog" aria-modal="true" aria-labelledby="buffs_title">
+    <div class="buffs-head">
+      <h3 id="buffs_title" style="margin:0">Active Buffs</h3>
+      <button class="buffs-close" id="buffs_close">Close ✕</button>
+    </div>
+    <div class="buff-list" id="buffs_list">
+              <div class="buff-row"><div class="buff-info">
+          <div class="buff-name">No active buffs</div>
+          <div class="buff-desc">Use items to activate temporary bonuses.</div>
+        </div></div>
+          </div>
+  </div>
+</div>
+
+</div>
+
+<script>
+(function(){
+  let secs = 2723;
+  const refillAmt = 49;
+  const maxStam = 1400;
+
+  const tEl = document.getElementById('stamina_timer');
+  const sEl = document.getElementById('stamina_span');
+
+  function fmt(n){ return n.toLocaleString(); }
+  function mmss(total){
+    const m = Math.floor(total / 60);
+    const s = total % 60;
+    return (m<10?'0':'')+m+':' + (s<10?'0':'')+s;
+  }
+
+  function tick(){
+    tEl.textContent = '⏳ ' + mmss(secs);
+
+    if (secs <= 0){
+      // Match the hourly refill without hiding potion overflow.
+      const current = parseInt((sEl.textContent || '0').replace(/[^0-9]/g,''), 10) || 0;
+      const next = Math.max(current, Math.min(maxStam, current + refillAmt));
+      if (next !== current){
+        sEl.textContent = fmt(next);
+      }
+      secs = 3600;
+    }
+    secs--;
+  }
+
+  tick();
+  setInterval(tick, 1000);
+})();
+</script>
+<script>
+(function(){
+  const el = document.getElementById('server_time');
+  if (!el) return;
+
+  let epoch  = parseInt(el.getAttribute('data-epoch'), 10) || Math.floor(Date.now()/1000);
+  const offS = parseInt(el.getAttribute('data-tzoff'), 10) || 0; // server offset (seconds from UTC)
+
+  function pad2(n){ return n < 10 ? '0' + n : '' + n; }
+
+  function render(){
+    // Shift by server offset, then read UTC fields => server-local time
+    const d = new Date((epoch + offS) * 1000);
+    let h = d.getUTCHours();
+    const m = d.getUTCMinutes();
+    const s = d.getUTCSeconds();
+    const am = h < 12;
+    let h12 = h % 12; if (h12 === 0) h12 = 12;
+    el.textContent = h12 + ':' + pad2(m) + ':' + pad2(s) + ' ' + (am ? 'AM' : 'PM');
+  }
+
+  render();
+  setInterval(function(){ epoch++; render(); }, 1000);
+})();
+</script>
+
+<script>
+(function(){
+  const btn   = document.getElementById('buffs_btn');
+  const modal = document.getElementById('buffs_modal');
+  const close = document.getElementById('buffs_close');
+  const list  = document.getElementById('buffs_list');
+
+  if (!btn || !modal || !list) return;
+
+  // Open / close
+  btn.addEventListener('click', () => { modal.classList.add('open'); modal.setAttribute('aria-hidden','false'); });
+  close.addEventListener('click', () => { modal.classList.remove('open'); modal.setAttribute('aria-hidden','true'); });
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) { modal.classList.remove('open'); modal.setAttribute('aria-hidden','true'); }
+  });
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal.classList.contains('open')) {
+      modal.classList.remove('open'); modal.setAttribute('aria-hidden','true');
+    }
+  });
+
+  // Countdown: align to server time to avoid client skew
+  const serverStartMs = (parseInt(document.getElementById('server_time')?.getAttribute('data-epoch') || '0', 10)) * 1000;
+  const offsetMs = serverStartMs ? (serverStartMs - Date.now()) : 0; // server - client
+
+  function nowServerSec(){ return Math.floor((Date.now() + offsetMs) / 1000); }
+  function fmtLeft(secs){
+    if (secs < 0) secs = 0;
+    const h = Math.floor(secs/3600);
+    const m = Math.floor((secs%3600)/60);
+    const s = secs%60;
+    return (h>0 ? (h+':'+String(m).padStart(2,'0')+':') : (m+':')) + String(s).padStart(2,'0');
+  }
+
+  function tick(){
+    const now = nowServerSec();
+    list.querySelectorAll('.buff-row').forEach(row => {
+      const ends = parseInt(row.getAttribute('data-ends') || '0', 10);
+      const left = Math.max(0, ends - now);
+      const label = row.querySelector('[data-ends-text]');
+      if (label) label.textContent = left > 0 ? (fmtLeft(left) + ' left') : 'expired';
+    });
+  }
+
+  tick();
+  setInterval(tick, 1000);
+})();
+</script>
+
+
+
+
+<style>
+/* ===== Global Chat Widget (gcw) ===== */
+#gcw_container{position:fixed; right:14px; bottom:14px; z-index:10050; font-family:'Segoe UI',Arial,sans-serif;}
+#gcw_toggle{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:46px; height:46px; border-radius:50%;
+  background:#2a2b3a; color:#fff; border:1px solid #2b2d44;
+  box-shadow:0 8px 24px rgba(0,0,0,.35); cursor:pointer; font-size:20px;
+}
+#gcw_toggle:hover{background:#343648}
+#gcw_panel{
+  position:absolute; right:0; bottom:56px; width:min(360px, 92vw);
+  max-height:80vh; display:flex; flex-direction:column; gap:0;
+  background:#1A1B25; border:1px solid #232437; border-radius:12px;
+  box-shadow:0 16px 40px rgba(0,0,0,.45); overflow:hidden;
+  transform:translateY(12px); opacity:0; pointer-events:none;
+  transition:opacity .18s ease, transform .18s ease;
+}
+#gcw_panel.gcw-open{opacity:1; transform:translateY(0); pointer-events:auto;}
+.gcw_head{
+  display:flex; align-items:center; justify-content:space-between; gap:8px;
+  padding:10px 12px; background:#171923; border-bottom:1px solid #232437; color:#EDEFF6
+}
+.gcw_title{font-weight:700}
+.gcw_actions{display:flex; gap:6px}
+.gcw_btn{background:#2a2b3a; color:#fff; border:1px solid #2b2d44; border-radius:8px; padding:6px 10px; cursor:pointer; font-size:12px}
+.gcw_btn:hover{background:#343648}
+#gcw_log{
+  background:#12131A; padding:8px 8px; overflow-y:auto; min-height:160px; max-height:52vh;
+}
+#gcw_log .msg{
+  display:flex; align-items:flex-start; gap:10px; padding:8px 10px;
+  border-bottom:1px solid #232437;
+}
+#gcw_log .msg:last-child{border-bottom:none}
+#gcw_log .avatar{width:30px; height:30px; border-radius:50%; object-fit:cover; background:#2b2d44; flex-shrink:0}
+#gcw_log .content{flex:1; min-width:0}
+#gcw_log .u{color:#FFD369; font-weight:600; margin-right:6px}
+#gcw_log .t{color:#9aa0be; font-size:12px; margin-left:6px}
+#gcw_log .text{margin-top:4px; color:#EDEFF6; word-wrap:break-word}
+
+.gcw_foot{padding:8px; background:#171923; border-top:1px solid #232437}
+#gcw_form{display:flex; gap:8px}
+#gcw_input{flex:1; padding:10px; border-radius:8px; border:1px solid #2B2D44; background:#12131A; color:#EDEFF6}
+#gcw_send{padding:10px 14px; border-radius:8px; border:1px solid #2B2D44; background:#2a2b3a; color:#fff; cursor:pointer}
+#gcw_send:disabled{opacity:.6; cursor:not-allowed}
+
+/* Small screens: keep panel usable */
+@media (max-width: 420px){
+  #gcw_panel{width:min(96vw, 360px); max-height:75vh}
+  #gcw_toggle{width:44px; height:44px}
+}
+/* --- Chat room tabs --- */
+.gcw_tabs{ display:flex; gap:6px; flex-wrap:wrap; }
+.gcw_tab{
+  background:#2a2b3a; color:#fff; border:1px solid #2b2d44;
+  border-radius:8px; padding:6px 10px; cursor:pointer; font-size:12px;
+}
+.gcw_tab[aria-selected="true"]{ background:#343648; border-color:#3a3d5a; }
+.gcw_tab[disabled]{ opacity:.55; cursor:not-allowed; }
+.gcw_room_hint{ font-size:12px; color:#cfcfe6; margin-left:8px }
+/* === Floating Nav FAB (bottom-left opener) === */
+#nav_fab.nav-fab-btn{
+  position:fixed;
+  left:14px;
+  bottom:14px;
+  z-index:10050; /* match or beat chat button */
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+
+  width:46px;
+  height:46px;
+  border-radius:50%;
+  background:#2a2b3a;
+  color:#fff;
+  border:1px solid #2b2d44;
+  box-shadow:0 8px 24px rgba(0,0,0,.35);
+  cursor:pointer;
+  font-size:20px;
+  line-height:1;
+  font-weight:700;
+}
+
+#nav_fab.nav-fab-btn:hover{
+  background:#343648;
+}
+
+body{padding-bottom: 8px}
+
+
+
+/* ✅ ADD HERE: Battle Consumable Drawer */
+.battle-drawer-trigger {
+  position:fixed;
+  right:65px;
+  bottom:17px;
+  z-index:10001;
+  background:#24263a;
+  border:1px solid #2f324d;
+  box-shadow:0 10px 24px rgba(0,0,0,.6);
+  border-radius:12px;
+  color:#fff;
+  font-weight:700;
+  font-size:14px;
+  line-height:1.2;
+  padding:10px 12px;
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+.battle-drawer-trigger .qtybubble{
+  background:#3a3d66;
+  border:1px solid #4d5096;
+  border-radius:999px;
+  padding:2px 6px;
+  font-size:11px;
+  font-weight:700;
+  color:#cfd4ff;
+}
+.battle-drawer-trigger:active { transform:scale(.97); }
+
+/* backdrop when drawer open */
+#battleDrawerBackdrop {
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.6);
+  z-index:10000;
+  display:none;
+}
+
+/* the sliding drawer */
+#battleDrawer {
+  position:fixed;
+  top:0;
+  right:-300px; /* hidden by default */
+  width:260px;
+  max-width:80vw;
+  height:100vh;
+  background:#1a1b25;
+  border-left:1px solid #2f324d;
+  box-shadow:0 0 30px rgba(0,0,0,.8);
+  z-index:10002;
+  padding:16px;
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+  transition:right .25s ease;
+  color:#fff;
+  font-family:Arial,sans-serif;
+  overflow-y: scroll;
+}
+
+body.drawer-open #battleDrawer {
+  right:0;
+}
+body.drawer-open #battleDrawerBackdrop {
+  display:block;
+}
+
+.battle-drawer-head {
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+}
+.battle-drawer-head .title {
+  font-size:15px;
+  font-weight:800;
+  color:#fff;
+  line-height:1.3;
+}
+.battle-drawer-head .subtitle {
+  font-size:12px;
+  color:#9aa0b8;
+  line-height:1.3;
+}
+.battle-drawer-close {
+  background:none;
+  border:none;
+  color:#cfd4ff;
+  font-size:18px;
+  padding:4px 6px;
+  cursor:pointer;
+  line-height:1;
+}
+.battle-drawer-close:hover { color:#fff; }
+
+/* potion item card */
+.potion-card {
+  background:#171923;
+  border:1px solid #24263a;
+  border-radius:10px;
+  padding:12px;
+  display:flex;
+  gap:10px;
+  box-shadow:0 6px 16px rgba(0,0,0,.4);
+  position:relative;
+}
+.potion-card img {
+  width:60px;
+  height:60px;
+  border-radius:8px;
+  object-fit:cover;
+  border:1px solid #2b2e49;
+  background:#22263a;
+}
+.potion-main {
+  flex:1 1 auto;
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+}
+.potion-name {
+  font-size:13px;
+  font-weight:700;
+  color:#fff;
+  margin-bottom:4px;
+  line-height:1.2;
+  display:flex;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:6px;
+}
+.potion-name .qtyleft {
+  font-size:11px;
+  font-weight:700;
+  background:#202235;
+  border:1px solid #2b2e49;
+  color:#cfd4ff;
+  border-radius:999px;
+  padding:2px 6px;
+}
+.potion-desc {
+  font-size:12px;
+  color:#9aa0b8;
+  line-height:1.4;
+  max-height:3.2em;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.potion-actions {
+  margin-top:8px;
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  align-items:center;
+}
+.potion-actions input[type="number"] {
+  width:60px;
+  padding:6px 8px;
+  font-size:13px;
+  border-radius:6px;
+  border:1px solid #2b2e49;
+  background:#1b1f30;
+  color:#e9ecff;
+  font-weight:600;
+}
+.potion-use-btn {
+  flex:1 1 auto;
+  min-width:0;
+  background:#4b5ef5;
+  border:none;
+  border-radius:8px;
+  padding:8px 10px;
+  font-size:13px;
+  font-weight:700;
+  color:#fff;
+  cursor:pointer;
+  text-align:center;
+  box-shadow:0 4px 10px rgba(0,0,0,.4);
+}
+.potion-use-btn:disabled {
+  opacity:.5;
+  cursor:not-allowed;
+}
+
+
+.gcw_reply_btn{
+  margin-left:8px;
+  font-size:12px;
+  padding:2px 8px;
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,.12);
+  background:rgba(255,255,255,.06);
+  color:#d8dcff;
+  cursor:pointer;
+}
+.gcw_reply_btn:hover{
+  background:rgba(255,255,255,.10);
+}
+/* ===== Thin, drawer-colored scrollbar (desktop) ===== */
+#battleDrawer{
+  /* Firefox */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,.18) #1a1b25; /* thumb, track */
+}
+
+/* Chrome / Edge / Safari */
+#battleDrawer::-webkit-scrollbar{
+  width: 6px;              /* extremely thin */
+}
+#battleDrawer::-webkit-scrollbar-track{
+  background: #1a1b25;     /* match drawer bg */
+}
+#battleDrawer::-webkit-scrollbar-thumb{
+  background: rgba(255,255,255,.16);
+  border-radius: 999px;
+  border: 2px solid #1a1b25;  /* creates “gap” so it feels embedded */
+}
+#battleDrawer::-webkit-scrollbar-thumb:hover{
+  background: rgba(255,255,255,.26);
+}
+#battleDrawer::-webkit-scrollbar-corner{
+  background: #1a1b25;
+}
+
+/* Optional: hide arrows on some Windows setups */
+#battleDrawer::-webkit-scrollbar-button{
+  width: 0;
+  height: 0;
+}
+
+
+
+
+</style>
+
+<div id="gcw_container" aria-live="polite">
+  <button id="gcw_toggle" aria-expanded="false" aria-controls="gcw_panel" title="Open chat" style="position:relative;">
+  💬
+  <span id="gcw_badge" style="
+    position:absolute; top:-6px; right:-6px;
+    min-width:18px; height:18px; padding:0 5px;
+    border-radius:999px;
+    background:#e74c3c; color:#fff;
+    font-size:12px; line-height:18px;
+    text-align:center;
+    display:none;
+    font-weight:700;
+    box-shadow:0 2px 8px rgba(0,0,0,.35);
+  ">0</span>
+</button>
+
+
+  <div id="gcw_panel" role="dialog" aria-modal="false" aria-label="Global Chat">
+    <div class="gcw_head">
+  <div class="gcw_tabs" role="tablist" aria-label="Chat rooms">
+    <button class="gcw_tab" id="tab_global" role="tab" aria-selected="true" data-room="global">Global</button>
+    <button class="gcw_tab" id="tab_guild"  role="tab"
+            disabled            aria-selected="false" data-room="guild">
+      Guild    </button>
+      </div>
+  <div class="gcw_actions">
+    <button class="gcw_btn" id="gcw_popout" title="Open full chat page">⤢</button>
+    <button class="gcw_btn" id="gcw_close" title="Close">✕</button>
+  </div>
+</div>
+
+
+    <div id="gcw_log">
+      <!-- filled by update on open -->
+      <div class="msg"><div class="content"><span class="u">System</span><span class="t">now</span><div class="text">Loading…</div></div></div>
+    </div>
+
+    <div class="gcw_foot">
+            <form id="gcw_form" autocomplete="off">
+        <input type="hidden" id="gcw_reply_to" value="0">
+        <input id="gcw_input" type="text" maxlength="300" placeholder="Type a message…"/>
+        <button id="gcw_send" type="submit">Send</button>
+      </form>
+          </div>
+  </div>
+</div>
+<!-- === NAV FLOAT BUTTON (bottom-left) === -->
+<button id="nav_fab"
+        class="nav-fab-btn"
+        aria-label="Open menu"
+        title="Menu">
+  ☰
+</button>
+
+
+<!-- === /NAV FLOAT BUTTON === -->
+    <!-- floating trigger button bottom-right -->
+    <button id="openBattleDrawerBtn"
+            class="battle-drawer-trigger"
+            type="button"
+            title="Battle Consumables">
+        🧪
+       
+    </button>
+
+    <!-- dark backdrop when drawer is open -->
+    <div id="battleDrawerBackdrop"></div>
+
+    <!-- slide-out drawer -->
+    <aside id="battleDrawer">
+        <div class="battle-drawer-head">
+            <div>
+                <div class="title">Battle Consumables</div>
+                <div class="subtitle">Use stamina potions without leaving the fight.</div>
+            </div>
+            <button class="battle-drawer-close" id="closeBattleDrawerBtn" aria-label="Close">✕</button>
+        </div>
+
+                <div class="potion-card" data-inv-id="1173050961" data-item-id="30">
+            <img src="images/items/1755316144_small_stamina_potion.webp" alt="Small Stamina Potion">
+            <div class="potion-main">
+                <div class="potion-name">
+                    <span>Small Stamina Potion</span>
+                    <span class="qtyleft">
+                        x<span class="potion-qty-left" id="pqty_1173050961">86</span>
+                    </span>
+                </div>
+                <div class="potion-desc">A magic Potion that Refills 20 Stamina.</div>
+
+                <div class="potion-actions">
+                    <input
+                        type="number"
+                        min="1"
+                        max="86"
+                        value="1"
+                        id="puse_1173050961"                     >
+                    <button
+                        class="potion-use-btn"
+                        data-inv="1173050961"
+                        data-item="30"
+                        data-name="Small Stamina Potion"
+                        data-max="86"
+                        type="button"
+                    >Use</button>
+                </div>
+            </div>
+        </div>
+                <div class="potion-card" data-inv-id="1169073614" data-item-id="35">
+            <img src="images/items/1755909636_full_stamina_potion.webp" alt="Full Stamina Potion">
+            <div class="potion-main">
+                <div class="potion-name">
+                    <span>Full Stamina Potion</span>
+                    <span class="qtyleft">
+                        x<span class="potion-qty-left" id="pqty_1169073614">27</span>
+                    </span>
+                </div>
+                <div class="potion-desc">A magic Potion that Fully Refills Your Stamina .</div>
+
+                <div class="potion-actions">
+                    <input
+                        type="number"
+                        min="1"
+                        max="27"
+                        value="1"
+                        id="puse_1169073614" readonly                    >
+                    <button
+                        class="potion-use-btn"
+                        data-inv="1169073614"
+                        data-item="35"
+                        data-name="Full Stamina Potion"
+                        data-max="27"
+                        type="button"
+                    >Use</button>
+                </div>
+            </div>
+        </div>
+                <div class="potion-card" data-inv-id="1169081603" data-item-id="162">
+            <img src="images/items/1764082355_-a2e1-05414364e2f1_3.webp" alt="Mana Potion S">
+            <div class="potion-main">
+                <div class="potion-name">
+                    <span>Mana Potion S</span>
+                    <span class="qtyleft">
+                        x<span class="potion-qty-left" id="pqty_1169081603">16</span>
+                    </span>
+                </div>
+                <div class="potion-desc">A magic Potion that Refills 20 Mana.</div>
+
+                <div class="potion-actions">
+                    <input
+                        type="number"
+                        min="1"
+                        max="16"
+                        value="1"
+                        id="puse_1169081603"                     >
+                    <button
+                        class="potion-use-btn"
+                        data-inv="1169081603"
+                        data-item="162"
+                        data-name="Mana Potion S"
+                        data-max="16"
+                        type="button"
+                    >Use</button>
+                </div>
+            </div>
+        </div>
+                <div class="potion-card" data-inv-id="1177469533" data-item-id="251">
+            <img src="images/items/1768627855_stamina_xl.webp" alt="Large Stamina Potion">
+            <div class="potion-main">
+                <div class="potion-name">
+                    <span>Large Stamina Potion</span>
+                    <span class="qtyleft">
+                        x<span class="potion-qty-left" id="pqty_1177469533">60</span>
+                    </span>
+                </div>
+                <div class="potion-desc">A magic Potion that Refills 5000 Stamina(Or 50% max stamina).</div>
+
+                <div class="potion-actions">
+                    <input
+                        type="number"
+                        min="1"
+                        max="60"
+                        value="1"
+                        id="puse_1177469533"                     >
+                    <button
+                        class="potion-use-btn"
+                        data-inv="1177469533"
+                        data-item="251"
+                        data-name="Large Stamina Potion"
+                        data-max="60"
+                        type="button"
+                    >Use</button>
+                </div>
+            </div>
+        </div>
+                <div class="potion-card" data-inv-id="1169073630" data-item-id="359">
+            <img src="images/items/Adventurer_Stamina_Potion.webp" alt="Adventurer Stamina Potion">
+            <div class="potion-main">
+                <div class="potion-name">
+                    <span>Adventurer Stamina Potion</span>
+                    <span class="qtyleft">
+                        x<span class="potion-qty-left" id="pqty_1169073630">5</span>
+                    </span>
+                </div>
+                <div class="potion-desc">A field-grade stamina draught prepared for long expeditions. Restores your stamina up to 50% of your Attack + Defense. This can exceed your max stamina, but any extra stamina is lost the next time you level up.</div>
+
+                <div class="potion-actions">
+                    <input
+                        type="number"
+                        min="1"
+                        max="5"
+                        value="1"
+                        id="puse_1169073630"                     >
+                    <button
+                        class="potion-use-btn"
+                        data-inv="1169073630"
+                        data-item="359"
+                        data-name="Adventurer Stamina Potion"
+                        data-max="5"
+                        type="button"
+                    >Use</button>
+                </div>
+            </div>
+        </div>
+                <div class="potion-card" data-inv-id="1169081599" data-item-id="108">
+            <img src="images/items/1760475550_hp_dungeon_portion.webp" alt="Full Hp Potion">
+            <div class="potion-main">
+                <div class="potion-name">
+                    <span>Full Hp Potion</span>
+                    <span class="qtyleft">
+                        x<span class="potion-qty-left" id="pqty_1169081599">37</span>
+                    </span>
+                </div>
+                <div class="potion-desc">A magic Potion that Heals You To Full Hp.</div>
+
+                <div class="potion-actions">
+                    <input
+                        type="number"
+                        min="1"
+                        max="37"
+                        value="1"
+                        id="puse_1169081599"                     >
+                    <button
+                        class="potion-use-btn"
+                        data-inv="1169081599"
+                        data-item="108"
+                        data-name="Full Hp Potion"
+                        data-max="37"
+                        type="button"
+                    >Use</button>
+                </div>
+            </div>
+        </div>
+            </aside>
+<div id="notification"
+     style="position:fixed; top:20px; right:20px; background:#2ecc71; color:white;
+            padding:12px 20px; border-radius:10px; box-shadow:0 4px 12px rgba(0,0,0,0.4);
+            font-size:15px; display:none; z-index:99999;">
+</div>
+
+<!-- Quick Set choice modal -->
+<div id="qsModalBackdrop" class="qs-modal-backdrop"></div>
+<div id="qsModal" class="qs-modal" aria-hidden="true" role="dialog" aria-modal="true">
+  <div class="qs-modal-dialog">
+    <div class="qs-modal-title">
+      Apply Quick Set <span id="qsModalSetNum"></span>
+    </div>
+    <div class="qs-modal-text" id="qsModalText">
+      Choose where to equip this quick set. It will overwrite your current items for that team.
+    </div>
+    <div class="qs-modal-actions">
+      <button type="button"
+              id="qsModalPveAttackBtn"
+              class="qs-modal-btn qs-modal-attack"
+              data-target="attack">
+        PvE Attack Set
+      </button>
+      <button type="button"
+              id="qsModalPvpAttackBtn"
+              class="qs-modal-btn qs-modal-attack"
+              data-target="pvp_attack">
+        PvP Attack Set
+      </button>
+      <button type="button"
+              id="qsModalDefenseBtn"
+              class="qs-modal-btn qs-modal-defense"
+              data-target="defense">
+        PvP Defense Set
+      </button>
+      <button type="button"
+              class="qs-modal-btn qs-modal-cancel"
+              data-target="cancel">
+        Cancel
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const isLoggedIn  = true;
+  const guildId     = 0;
+  const hasCouncil = false;
+  const tabCouncil = document.getElementById('tab_council');
+
+  const elToggle = document.getElementById('gcw_toggle');
+  const elPanel  = document.getElementById('gcw_panel');
+  const elLog    = document.getElementById('gcw_log');
+  const elClose  = document.getElementById('gcw_close');
+  const elPopout = document.getElementById('gcw_popout');
+
+  const elForm   = document.getElementById('gcw_form');
+  const elInput  = document.getElementById('gcw_input');
+  const elSend   = document.getElementById('gcw_send');
+
+  const tabGlobal = document.getElementById('tab_global');
+  const tabGuild  = document.getElementById('tab_guild');
+
+  let pollTimer  = null;
+  let lastHTML   = '';
+  let openedOnce = false;
+  let isOpen     = false;
+
+
+
+  const elBadge = document.getElementById('gcw_badge');
+
+  function setBadge(n){
+    if (!elBadge) return;
+    n = parseInt(n, 10) || 0;
+    if (n > 0){
+      elBadge.textContent = (n > 99 ? '99+' : String(n));
+      elBadge.style.display = 'inline-block';
+    } else {
+      elBadge.style.display = 'none';
+    }
+  }
+
+  async function refreshUnseenBadge(){
+    if (!isLoggedIn) { setBadge(0); return; }
+    try{
+      const r = await fetch('chat_unseen_count.php', { cache:'no-store' });
+      const d = await r.json().catch(()=>null);
+      if (d && (''+d.status).trim() === 'success') setBadge(d.count);
+    }catch(_){}
+  }
+
+  async function markRepliesSeenIfAny(){
+    if (!isLoggedIn) return;
+    // only hit server if badge already shows >0 (cheap)
+    const current = elBadge && elBadge.style.display !== 'none'
+      ? parseInt(elBadge.textContent, 10) || 1
+      : 0;
+    if (!current) return;
+
+    try{
+      const r = await fetch('chat_mark_seen.php', { method:'POST', cache:'no-store' });
+      const d = await r.json().catch(()=>null);
+      if (d && (''+d.status).trim() === 'success'){
+        setBadge(0);
+      }
+    }catch(_){}
+  }
+
+
+// Reply button -> set reply_to + insert @username into chat input
+document.addEventListener('click', (e) => {
+  const btn = e.target.closest('.gcw_reply_btn');
+  if (!btn) return;
+
+  const replyUid = parseInt(btn.getAttribute('data-uid') || '0', 10) || 0;
+  const u = (btn.getAttribute('data-username') || '').trim();
+  if (!u) return;
+
+  // store reply target
+  const replyHidden = document.getElementById('gcw_reply_to');
+  if (replyHidden) replyHidden.value = String(replyUid);
+
+  const input = document.getElementById('gcw_input');
+  if (!input) return;
+
+  const tag = '@' + u;
+  const start = input.selectionStart ?? input.value.length;
+  const end   = input.selectionEnd ?? input.value.length;
+
+  const before = input.value.slice(0, start);
+  const after  = input.value.slice(end);
+
+  const needsSpaceBefore = before.length && !/\s$/.test(before);
+  const insert = (needsSpaceBefore ? ' ' : '') + tag + ' ';
+
+  input.value = before + insert + after;
+
+  const newPos = (before + insert).length;
+  input.focus();
+  input.setSelectionRange(newPos, newPos);
+});
+
+
+  // ---- rooms
+  const LS_KEY_ROOM = 'gcw_room';
+  function getSavedRoom(){
+  const r = (localStorage.getItem(LS_KEY_ROOM) || 'global').toLowerCase();
+  if (r === 'guild'   && !guildId)   return 'global';
+  if (r === 'council' && !hasCouncil) return 'global';
+  return (r === 'guild' || r === 'council' || r === 'global') ? r : 'global';
+}
+  function saveRoom(r){ try{ localStorage.setItem(LS_KEY_ROOM, r); }catch(_){ } }
+
+  let room = getSavedRoom(); // 'global' | 'guild'
+
+  function setActiveTab(){
+  if (tabGlobal)  tabGlobal.setAttribute('aria-selected', room === 'global'  ? 'true':'false');
+  if (tabGuild)   tabGuild .setAttribute('aria-selected', room === 'guild'   ? 'true':'false');
+  if (tabCouncil) tabCouncil.setAttribute('aria-selected', room === 'council' ? 'true':'false');
+}
+
+  function currentEndpoints(){
+  if (room === 'guild') {
+    // Use your real guild endpoints, channel fixed to "general"
+    return {
+      update: 'guild_updatechat.php?channel=general',
+      send:   'guild_chat_send.php'
+    };
+  }
+  if (room === 'council') {
+    return {
+      update: 'council_updatechat.php',
+      send:   'council_chat_send.php'
+    };
+  }
+  // global
+  return {
+    update: 'updatechat.php',
+    send:   'chat_send.php'
+  };
+}
+
+
+  function renderRoomHeader(){
+    // Optional: you can reflect the title somewhere if desired
+    // (we kept title in the tabs; nothing else needed here)
+  }
+
+  function saveOpenState(open){
+    try{ localStorage.setItem('gcw_open', open ? '1' : '0'); }catch(_){}
+  }
+  function loadOpenState(){
+    try{ return localStorage.getItem('gcw_open') === '1'; }catch(_){ return false; }
+  }
+
+  function openPanel(){
+    if (isOpen) return;
+    isOpen = true;
+    elPanel.classList.add('gcw-open');
+    elToggle.setAttribute('aria-expanded','true');
+    saveOpenState(true);
+    if (!openedOnce){ fetchAndRender(true); openedOnce = true; }
+    startPolling();
+    setTimeout(() => { elLog.scrollTop = elLog.scrollHeight; }, 50);
+    markRepliesSeenIfAny();
+  }
+  function closePanel(){
+    if (!isOpen) return;
+    isOpen = false;
+    elPanel.classList.remove('gcw-open');
+    elToggle.setAttribute('aria-expanded','false');
+    saveOpenState(false);
+    stopPolling();
+  }
+
+  elToggle.addEventListener('click', () => { isOpen ? closePanel() : openPanel(); });
+  elClose .addEventListener('click', closePanel);
+  elPopout.addEventListener('click', () => {
+  if (room === 'guild' && guildId){
+    window.location.href = 'guild_chat.php?channel=general';
+  } else if (room === 'council' && hasCouncil){
+    window.location.href = 'council_chat.php';
+  } else {
+    window.location.href = 'chat.php';
+  }
+});
+
+  // Switch tabs
+  if (tabGlobal) tabGlobal.addEventListener('click', () => switchRoom('global'));
+  if (tabGuild)  tabGuild .addEventListener('click', () => { if (guildId) switchRoom('guild'); });
+  if (tabCouncil) tabCouncil.addEventListener('click', () => { if (hasCouncil) switchRoom('council'); });
+
+  function switchRoom(next){
+  if (next === room) return;
+  room = next;
+  saveRoom(room);
+  setActiveTab();
+  lastHTML = '';
+
+  // Handle access
+  if (room === 'guild' && !guildId){
+    stopPolling();
+    elLog.innerHTML = `
+      <div class="msg"><div class="content">
+        <span class="u">System</span>
+        <span class="t">now</span>
+        <div class="text">You are not in a guild yet. Join or create a guild to use Guild Chat.</div>
+      </div></div>`;
+    if (elForm){ elInput.disabled = true; elSend.disabled = true; }
+    return;
+  }
+  if (room === 'council' && !hasCouncil){
+    stopPolling();
+    elLog.innerHTML = `
+      <div class="msg"><div class="content">
+        <span class="u">System</span>
+        <span class="t">now</span>
+        <div class="text">Council Chat is restricted to guild leaders and vice leaders.</div>
+      </div></div>`;
+    if (elForm){ elInput.disabled = true; elSend.disabled = true; }
+    return;
+  }
+
+  if (elForm){ elInput.disabled = false; elSend.disabled = false; }
+  fetchAndRender(true);
+  if (isOpen) startPolling();
+}
+
+
+  function startPolling(){
+    stopPolling();
+    if (room === 'guild' && !guildId) return; // nothing to poll
+    if (room === 'council' && !hasCouncil) return; 
+    pollTimer = setInterval(fetchAndRender, 1500);
+  }
+  function stopPolling(){
+    if (pollTimer){ clearInterval(pollTimer); pollTimer = null; }
+  }
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden || !isOpen) { stopPolling(); }
+    else { startPolling(); fetchAndRender(); }
+  });
+
+  async function fetchAndRender(first=false){
+  try{
+    if (room === 'guild'   && !guildId)   return;
+    if (room === 'council' && !hasCouncil) return; // ← add
+    const logEl = elLog;
+    const wasNearBottom = (logEl.scrollHeight - logEl.scrollTop - logEl.clientHeight) < 120;
+    const { update } = currentEndpoints();
+    const r = await fetch(update, { method:'POST', cache:'no-store' });
+    if (!r.ok) return;
+    const html = await r.text();
+    if (html !== lastHTML){
+      lastHTML = html;
+      elLog.innerHTML = html;
+      if (first || wasNearBottom) logEl.scrollTop = logEl.scrollHeight;
+    }
+  }catch(e){ /* silent */ }
+}
+
+
+  if (isLoggedIn && elForm){
+    elForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (room === 'guild' && !guildId){
+        alert('Join a guild to chat in Guild channel.');
+        return;
+      }
+      const text = (elInput.value || '').trim();
+      if (!text) return;
+      if (text.length > 300) { alert('Message too long.'); return; }
+      elSend.disabled = true;
+      try{
+        const { send } = currentEndpoints();
+const replyTo = document.getElementById('gcw_reply_to')?.value || '0';
+
+const body = 'message=' + encodeURIComponent(text)
+           + '&reply_to=' + encodeURIComponent(replyTo)
+           + (room === 'guild' ? '&channel=general' : '');
+
+const r = await fetch(send, {
+  method:'POST',
+  headers:{'Content-Type':'application/x-www-form-urlencoded'},
+  body
+});
+
+        const data = await r.json().catch(()=>null);
+        if (data && (''+data.status).trim() === 'success'){
+          elInput.value = '';
+const rt = document.getElementById('gcw_reply_to');
+if (rt) rt.value = '0';
+await fetchAndRender();     // <-- make it await
+  refreshUnseenBadge();       // <-- add this
+
+        }else{
+          alert((data && data.message) || 'Failed to send.');
+        }
+      }catch(_){
+        alert('Server error.');
+      }
+      elSend.disabled = false;
+      elInput.focus();
+    });
+  }
+
+  // init
+  setActiveTab();
+  renderRoomHeader();
+  refreshUnseenBadge();
+  setInterval(refreshUnseenBadge, 300000);
+  if (loadOpenState()) { openPanel(); }
+  else {
+    // lazy-load the first selected room once user opens the panel
+  }
+})();
+</script>
+
+<script>
+// Announcement dismiss logic
+(function(){
+  const bar   = document.getElementById('globalAnnouncementBar');
+  const btn   = document.getElementById('dismissAnnouncementBtn');
+  if (!bar || !btn) return;
+
+  btn.addEventListener('click', function(){
+    const annId = bar.getAttribute('data-ann-id') || '0';
+
+
+    bar.style.display = 'none';
+
+    const fd = new URLSearchParams();
+    fd.set('ann_id', annId);
+
+    fetch('announcement_seen.php', {
+        method: 'POST',
+        headers: {'Content-Type':'application/x-www-form-urlencoded'},
+        body: fd.toString()
+    })
+    .then(r => r.json())
+    .then(data => {
+ 
+    })
+    .catch(()=>{  });
+  });
+})();
+</script>
+<script>
+// side nav open/close logic
+(function(){
+  const drawer   = document.getElementById('sideDrawer');
+  const fabOpen  = document.getElementById('nav_fab');       // 👈 bottom-left button
+  const closeBtn = document.getElementById('sideCloseBtn');  // ✕ inside drawer header
+  const overlay  = document.getElementById('sideOverlay');   // dark backdrop on mobile
+
+  if (!drawer) return;
+
+  function openDrawer(){
+    drawer.setAttribute('data-open','true');
+  }
+  function closeDrawer(){
+    drawer.setAttribute('data-open','false');
+  }
+
+  if (fabOpen){
+    fabOpen.addEventListener('click', openDrawer);
+  }
+  if (closeBtn){
+    closeBtn.addEventListener('click', closeDrawer);
+  }
+  if (overlay){
+    overlay.addEventListener('click', closeDrawer);
+  }
+
+  // ESC closes only on mobile view (doesn't really matter to check width though)
+  window.addEventListener('keydown', (e)=>{
+    if (e.key === 'Escape'){
+      closeDrawer();
+    }
+  });
+})();
+
+
+(function(){
+    const bodyEl = document.body;
+    const openBtn    = document.getElementById('openBattleDrawerBtn');
+    const closeBtnn   = document.getElementById('closeBattleDrawerBtn');
+    const backdrop   = document.getElementById('battleDrawerBackdrop');
+
+    function openDrawerr(){
+        bodyEl.classList.add('drawer-open');
+    }
+    function closeDrawerr(){
+        bodyEl.classList.remove('drawer-open');
+    }
+
+    if (openBtn)    openBtn.addEventListener('click', openDrawerr);
+    if (closeBtnn)   closeBtnn.addEventListener('click', closeDrawerr);
+    if (backdrop)   backdrop.addEventListener('click', closeDrawerr);
+})();
+// Quick Sets drawer open/close
+(function(){
+    const bodyEl   = document.body;
+    const openBtn  = document.getElementById('openQuickSetDrawerBtn');
+    const closeBtn = document.getElementById('closeQuickSetDrawerBtn');
+    const backdrop = document.getElementById('qsDrawerBackdrop');
+
+    if (!openBtn && !closeBtn && !backdrop) return;
+
+    function openDrawer() {
+        bodyEl.classList.add('qsdrawer-open');
+    }
+    function closeDrawer() {
+        bodyEl.classList.remove('qsdrawer-open');
+    }
+
+    if (openBtn)  openBtn.addEventListener('click', openDrawer);
+    if (closeBtn) closeBtn.addEventListener('click', closeDrawer);
+    if (backdrop) backdrop.addEventListener('click', closeDrawer);
+
+    window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            closeDrawer();
+        }
+    });
+})();
+
+function showNotification(msg, type = 'success') {
+  const note = document.getElementById('notification');
+  if (!note) return;
+  note.innerHTML = msg;
+  note.style.background = (type === 'error') ? '#e74c3c' : '#2ecc71';
+  note.style.display = 'block';
+  setTimeout(() => { note.style.display = 'none'; }, 3000);
+}
+(function(){
+    document.addEventListener('click', async function(e){
+        const btn = e.target.closest('.potion-use-btn');
+        if (!btn) return;
+
+        const invId   = btn.getAttribute('data-inv');
+        const itemId  = btn.getAttribute('data-item');
+        if (window.ExpPotions && window.ExpPotions.handles(itemId)) {
+            await window.ExpPotions.use(invId, itemId);
+            return;
+        }
+        const itemNm  = btn.getAttribute('data-name') || 'Item';
+        const maxQty  = parseInt(btn.getAttribute('data-max'), 10) || 1;
+        const qtyInput= document.getElementById('puse_'+invId);
+        const qtyLeftSpan = document.getElementById('pqty_'+invId);
+
+        let useQty = 1;
+        if (qtyInput) {
+            useQty = parseInt(qtyInput.value,10) || 1;
+            if (useQty < 1) useQty = 1;
+            if (useQty > maxQty) useQty = maxQty;
+        }
+
+        if (!confirm(`Use ${useQty}x ${itemNm}? This will consume the item(s).`)) {
+            return;
+        }
+
+        btn.disabled = true;
+        btn.textContent = '...';
+
+        const params = new URLSearchParams();
+        params.set('inv_id', invId);
+        if (useQty > 1) params.set('qty', useQty);
+
+        try {
+            const endpoint = (parseInt(itemId, 10) === 108) ? 'user_heal_potion.php' : 'use_item.php';
+
+            const res = await fetch(endpoint, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                body: params.toString()
+            });
+
+            const raw = await res.text();
+            const lower = raw.trim().toLowerCase();
+
+            if (lower.includes('success')) {
+                showNotification('Used ' + itemNm + '!', 'success');
+
+                // update qty inside drawer
+                let leftNow = parseInt(qtyLeftSpan.textContent,10) || 0;
+                leftNow = leftNow - useQty;
+                if (leftNow < 0) leftNow = 0;
+                qtyLeftSpan.textContent = leftNow;
+
+                // update btn / input max
+                btn.setAttribute('data-max', leftNow);
+                if (qtyInput) {
+                    qtyInput.setAttribute('max', leftNow);
+                    if (leftNow === 0) qtyInput.value = 0;
+                }
+
+                // update the bubble on trigger
+                const totalBubble = document.getElementById('drawerTotalQty');
+                if (totalBubble) {
+                    let totalAll = 0;
+                    document.querySelectorAll('.potion-qty-left').forEach(sp => {
+                        totalAll += (parseInt(sp.textContent,10) || 0);
+                    });
+                    totalBubble.textContent = totalAll;
+                }
+
+                // if out of stock disable button
+                if (leftNow <= 0) {
+                    btn.disabled = true;
+                    btn.textContent = 'None';
+                } else {
+                    btn.disabled = false;
+                    btn.textContent = 'Use';
+                }
+
+                // optional refresh to sync stamina/HP/etc
+                location.reload();
+            } else {
+                showNotification(raw.slice(0,200) || 'Failed to use item.', 'error');
+                btn.disabled = false;
+                btn.textContent = 'Use';
+            }
+        } catch (err) {
+            showNotification('Server error.', 'error');
+            btn.disabled = false;
+            btn.textContent = 'Use';
+        }
+    });
+})();
+
+
+(function(){
+    let selectedSetNum   = null;
+    let selectedApplyType = 'equipments';
+
+
+    const bodyEl        = document.body;
+    const modalBackdrop = document.getElementById('qsModalBackdrop');
+    const modal         = document.getElementById('qsModal');
+    const setSpan       = document.getElementById('qsModalSetNum');
+    const modalText     = document.getElementById('qsModalText');
+    const pveAttackBtn  = document.getElementById('qsModalPveAttackBtn');
+    const pvpAttackBtn  = document.getElementById('qsModalPvpAttackBtn');
+    const defenseBtn    = document.getElementById('qsModalDefenseBtn');
+
+    function syncQuickSetModalTargets() {
+        if (!pveAttackBtn || !pvpAttackBtn || !defenseBtn) return;
+
+        if (selectedApplyType === 'pets') {
+            if (modalText) {
+                modalText.textContent = 'Choose which pet team to update. It will overwrite your current pets for that team.';
+            }
+
+            pveAttackBtn.textContent = 'PvE Attack Team';
+            pveAttackBtn.setAttribute('data-target', 'attack');
+            pveAttackBtn.style.display = '';
+
+            pvpAttackBtn.textContent = 'PvP Attack Team';
+            pvpAttackBtn.setAttribute('data-target', 'pvp_attack');
+            pvpAttackBtn.style.display = '';
+
+            defenseBtn.textContent = 'PvP Defense Team';
+            defenseBtn.setAttribute('data-target', 'defense');
+        } else {
+            if (modalText) {
+                modalText.textContent = 'Choose which equipment set to update. It will overwrite your current items for that set.';
+            }
+
+            pveAttackBtn.textContent = 'PvE Attack Set';
+            pveAttackBtn.setAttribute('data-target', 'attack');
+            pveAttackBtn.style.display = '';
+
+            pvpAttackBtn.textContent = 'PvP Attack Set';
+            pvpAttackBtn.setAttribute('data-target', 'pvp_attack');
+            pvpAttackBtn.style.display = '';
+
+            defenseBtn.textContent = 'PvP Defense Set';
+            defenseBtn.setAttribute('data-target', 'defense');
+        }
+    }
+
+        function openModal(setNum, applyType) {
+        selectedSetNum    = setNum;
+        selectedApplyType = (applyType === 'pets') ? 'pets' : 'equipments';
+
+        if (setSpan) {
+            // Example: "#3 – Gear" or "#3 – Pets"
+            const labelSuffix = (selectedApplyType === 'pets') ? ' – Pets' : ' – Gear';
+            setSpan.textContent = '#' + setNum + labelSuffix;
+        }
+
+        syncQuickSetModalTargets();
+        bodyEl.classList.add('qsmodal-open');
+        if (modal)  modal.setAttribute('aria-hidden', 'false');
+    }
+
+
+    function closeModal() {
+        selectedSetNum = null;
+        bodyEl.classList.remove('qsmodal-open');
+        if (modal)  modal.setAttribute('aria-hidden', 'true');
+    }
+
+
+    document.addEventListener('click', function(e){
+        // Click on a quick set button inside the drawer
+        const setBtn = e.target.closest('.qs-set-btn');
+        if (setBtn) {
+            const setNum    = parseInt(setBtn.getAttribute('data-set-number') || '0', 10);
+            const applyType = (setBtn.getAttribute('data-apply-type') || 'equipments').toLowerCase();
+
+            if (setNum > 0) {
+                openModal(setNum, applyType);
+            }
+            return;
+        }
+
+        if (!bodyEl.classList.contains('qsmodal-open')) return;
+
+        // Click outside dialog on the dark backdrop
+        if (e.target === modalBackdrop) {
+            closeModal();
+            return;
+        }
+
+        const actionBtn = e.target.closest('.qs-modal-btn');
+        if (!actionBtn) return;
+
+        const target = actionBtn.getAttribute('data-target');
+        if (target === 'cancel') {
+            closeModal();
+            return;
+        }
+
+        if (!selectedSetNum || (target !== 'attack' && target !== 'defense' && target !== 'pvp_attack')) {
+            closeModal();
+            return;
+        }
+
+        applyQuickSet(selectedSetNum, target, actionBtn);
+    });
+
+    async function applyQuickSet(setNum, target, actionBtn) {
+        const originalText = actionBtn.textContent;
+        actionBtn.disabled = true;
+        actionBtn.textContent = 'Applying...';
+
+        const params = new URLSearchParams();
+        params.set('set_number', String(setNum));
+        params.set('target_set', target);
+        params.set('apply_type', selectedApplyType); // "equipment" or "pets"
+
+        try {
+            const res = await fetch('quick_sets_apply.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: params.toString()
+            });
+            const raw   = await res.text();
+            const lower = raw.trim().toLowerCase();
+
+            if (lower.includes('success')) {
+                const targetLabel = (selectedApplyType === 'pets')
+                    ? (target === 'defense' ? 'PvP DEFENSE' : 'ATTACK')
+                    : (target === 'pvp_attack' ? 'PVP ATTACK' : (target === 'defense' ? 'PVP DEFENSE' : 'PVE ATTACK'));
+                showNotification(
+                    `Quick Set #${setNum} equipped as your ${targetLabel} set.`,
+                    'success'
+                );
+                closeModal();
+                // If you want immediate refresh to reflect new stats/gear:
+                setTimeout(() => { location.reload(); }, 600);
+            } else {
+                showNotification(raw.slice(0, 200) || 'Failed to apply quick set.', 'error');
+                actionBtn.disabled = false;
+                actionBtn.textContent = originalText;
+            }
+        } catch (err) {
+            showNotification('Server error while applying quick set.', 'error');
+            actionBtn.disabled = false;
+            actionBtn.textContent = originalText;
+        }
+    }
+
+    // ESC closes modal
+    window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && bodyEl.classList.contains('qsmodal-open')) {
+            closeModal();
+        }
+    });
+})();
+
+
+</script>
+<script>
+// Record one authenticated game visit per server day for retention cohorts.
+(function () {
+  const serverDay = "2026-11-23";
+  const storageKey = 'veyra_game_activity_day';
+  try {
+    if (localStorage.getItem(storageKey) === serverDay) return;
+  } catch (_e) {}
+
+  fetch('/game_activity_ping.php', {
+    method: 'POST',
+    credentials: 'same-origin',
+    cache: 'no-store',
+    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+  }).then((response) => response.ok ? response.json() : null)
+    .then((payload) => {
+      if (!payload || payload.ok !== true) return;
+      try { localStorage.setItem(storageKey, serverDay); } catch (_e) {}
+    })
+    .catch(() => {});
+})();
+</script>
+<script>
+// Prevent old per-wave UI cookies from growing into an oversized Cookie header.
+(function(){
+  try {
+    const rawCookie = document.cookie || '';
+    const waveFilterNames = rawCookie
+      .split(';')
+      .map((part) => part.trim().split('=')[0])
+      .filter((name) => /^wave_filters_/.test(name));
+
+    if (rawCookie.length < 6000 && waveFilterNames.length <= 8) {
+      return;
+    }
+
+    waveFilterNames.forEach((name) => {
+      document.cookie = `${name}=; Max-Age=0; Path=/; SameSite=Lax`;
+      document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; Path=/; SameSite=Lax`;
+    });
+  } catch (_e) {}
+})();
+</script>
+<script>
+// Guild announcement dismiss logic
+(function(){
+  const bar = document.getElementById('guildAnnouncementBar');
+  const btn = document.getElementById('dismissGuildAnnouncementBtn');
+  if (!bar || !btn) return;
+
+  btn.addEventListener('click', function(){
+    const annId = bar.getAttribute('data-ann-id') || '0';
+    bar.style.display = 'none';
+
+    const fd = new URLSearchParams();
+    fd.set('ann_id', annId);
+
+    fetch('announcement_guild_seen.php', {
+      method: 'POST',
+      headers: {'Content-Type':'application/x-www-form-urlencoded'},
+      body: fd.toString(),
+      cache: 'no-store'
+    }).catch(()=>{});
+  });
+})();
+</script>
+
+<script>window.expPotionSettings = {"userId":187959,"csrf":"f0b7a69f043659e3244cf985b3e3a89f8a771e8028322e91933f59e1de4c2331","items":{"97":{"name":"Exp Potion S","rate":0.1,"minutes":60},"797":{"name":"Exp Potion M","rate":0.15,"minutes":60},"798":{"name":"Exp Potion L","rate":0.2,"minutes":60},"799":{"name":"Exp Potion XL","rate":0.4,"minutes":180}}};</script>
+<script src="/assets/exp-potions.js?v=20260925-1"></script>
+<main class="guild-directory">
+  <header class="gd-hero"><div><p class="gd-kicker">The guild registry</p><h1>Under one banner.</h1><p>Discover the guilds of Veyra. Meet their members. Find your place.</p></div><a class="gd-button" href="game_dash.php">Back to game</a></header>
+            <a class="gd-back" href="guild_join_create.php">&larr; All guilds</a>
+    <section class="gd-profile"><div class="gd-identity"><img class="gd-emblem" src="/images/guilds/emblems/emblem_32_7cf218fc4cba.png" alt="" width="80" height="80"><div><p class="gd-tag">[DA]</p><h2>Dagorath Alliance</h2><p>242 / 300 members &middot; Open recruitment</p></div></div><p class="gd-description">Currently Recruiting
+
+Players of all levels are welcome we do daily dungeons and cube and can carry new players in duengons   .
+Join us and rise together and leave our mark.</p>
+      <div class="gd-guild-action">
+<form method="post" class="gd-action-form"><input type="hidden" name="csrf" value="c0b90a130ad72b95a80066f5ac8d62e4eb0f8f24183104b7cd1326e015dbcf7c"><input type="hidden" name="form_id" value="e0605a6699907bf7bd5334c2e3da73cadbc760a2b73fff37"><input type="hidden" name="guild_id" value="32"><input type="hidden" name="action" value="join_open">
+    <button class="gd-button gd-primary" >Join this guild</button>
+</form></div>
+      <section class="panel guild-trophy-panel" style="padding:20px;border:1px solid #493e2b;border-radius:12px;background:linear-gradient(130deg,#191a19,#12151a);margin:18px 0"><h2 style="font:600 24px Georgia,serif;color:#d9c49b;margin-top:0">Guild Trophies</h2><article style="display:inline-block;padding:12px 16px;border:1px solid #443d30;border-radius:8px;margin:5px;color:#ead8ae"><strong>The First Wingbeat</strong><small style="display:block;color:#9daaa5;margin-top:6px">2026-11-19</small></article><article style="display:inline-block;padding:12px 16px;border:1px solid #443d30;border-radius:8px;margin:5px;color:#ead8ae"><strong>Hunters of Legendary Ridge Dragon</strong><small style="display:block;color:#9daaa5;margin-top:6px">2026-11-14</small></article></section>    </section>
+    <section class="gd-roster"><header class="gd-section-heading"><div><p class="gd-kicker">The people behind the banner</p><h2>Guild members</h2></div><form method="get" class="gd-member-search"><input type="hidden" name="guild_id" value="32"><label class="gd-sr-only" for="member-search">Search members</label><input id="member-search" name="member" value="" maxlength="80" placeholder="Search a member"><button class="gd-button">Search</button></form></header>
+      <div class="gd-roster-grid"><a class="gd-member" href="player.php?pid=105976"><img src="uploads/avatars/user_105976_1761997532.jpg" alt="" loading="lazy" width="46" height="46"><div><strong>[DA]hr408</strong><span>Level 8,521 &middot; Warrior</span><small class="gd-role">Leader</small></div></a><a class="gd-member" href="player.php?pid=139642"><img src="uploads/avatars/user_139642_1774612278.jpg" alt="" loading="lazy" width="46" height="46"><div><strong>[DA] gibon</strong><span>Level 12,037 &middot; Mage</span><small class="gd-role">Vice leader</small></div></a><a class="gd-member" href="player.php?pid=131197"><img src="images/userpics/midoriya.webp" alt="" loading="lazy" width="46" height="46"><div><strong>[AD] sams1i</strong><span>Level 7,995 &middot; Cleric</span><small class="gd-role">Vice leader</small></div></a><a class="gd-member" href="player.php?pid=126965"><img src="images/userpics/midoriya.webp" alt="" loading="lazy" width="46" height="46"><div><strong>kuroyashiki</strong><span>Level 7,648 &middot; Hunter</span><small class="gd-role">Vice leader</small></div></a><a class="gd-member" href="player.php?pid=128054"><img src="uploads/avatars/user_128054_1772736675.webp" alt="" loading="lazy" width="46" height="46"><div><strong>[DA]Kodi balu</strong><span>Level 6,992 &middot; Cleric</span><small class="gd-role">Vice leader</small></div></a><a class="gd-member" href="player.php?pid=166129"><img src="uploads/avatars/user_166129_1784810166.jpg" alt="" loading="lazy" width="46" height="46"><div><strong>[DA] Halos</strong><span>Level 4,961 &middot; Hunter</span><small class="gd-role">Vice leader</small></div></a><a class="gd-member" href="player.php?pid=137678"><img src="uploads/avatars/user_137678_1776124926.jpg" alt="" loading="lazy" width="46" height="46"><div><strong>[DA] Y.Joker </strong><span>Level 7,246 &middot; Cleric</span><small class="gd-role">Member</small></div></a><a class="gd-member" href="player.php?pid=138028"><img src="uploads/avatars/user_138028_1775222941.jpg" alt="" loading="lazy" width="46" height="46"><div><strong>[DA]Ardath </strong><span>Level 5,639 &middot; Cleric</span><small class="gd-role">Member</small></div></a><a class="gd-member" href="player.php?pid=138855"><img src="uploads/avatars/user_138855_1779339184.jpg" alt="" loading="lazy" width="46" height="46"><div><strong>[DA] inskstril </strong><span>Level 5,367 &middot; Mage</span><small class="gd-role">Member</small></div></a><a class="gd-member" href="player.php?pid=103367"><img src="uploads/avatars/user_103367_1786001767.webp" alt="" loading="lazy" width="46" height="46"><div><strong> [DA]Unknown</strong><span>Level 5,077 &middot; Hunter</span><small class="gd-role">Member</small></div></a><a class="gd-member" href="player.php?pid=159296"><img src="images/userpics/midoriya.webp" alt="" loading="lazy" width="46" height="46"><div><strong>[DA] Collar.N.Jacket</strong><span>Level 5,057 &middot; Hunter</span><small class="gd-role">Member</small></div></a><a class="gd-member" href="player.php?pid=145706"><img src="images/userpics/midoriya.webp" alt="" loading="lazy" width="46" height="46"><div><strong>Shadowbalu</strong><span>Level 4,951 &middot; Cleric</span><small class="gd-role">Member</small></div></a><a class="gd-member" href="player.php?pid=124112"><img src="uploads/avatars/user_124112_1772668747.png" alt="" loading="lazy" width="46" height="46"><div><strong>Ragicette </strong><span>Level 4,641 &middot; Cleric</span><small class="gd-role">Member</small></div></a><a class="gd-member" href="player.php?pid=157437"><img src="images/userpics/midoriya.webp" alt="" loading="lazy" width="46" height="46"><div><strong>Bocy</strong><span>Level 4,589 &middot; Hunter</span><small class="gd-role">Member</small></div></a><a class="gd-member" href="player.php?pid=138676"><img src="uploads/avatars/user_138676_1776868842.jpeg" alt="" loading="lazy" width="46" height="46"><div><strong>[DA] Darksenaider </strong><span>Level 4,511 &middot; Warrior</span><small class="gd-role">Member</small></div></a><a class="gd-member" href="player.php?pid=141369"><img src="uploads/avatars/user_141369_1775944644.png" alt="" loading="lazy" width="46" height="46"><div><strong>[DA] Dragon</strong><span>Level 4,265 &middot; Warrior</span><small class="gd-role">Member</small></div></a><a class="gd-member" href="player.php?pid=163414"><img src="uploads/avatars/user_163414_1782943903.png" alt="" loading="lazy" width="46" height="46"><div><strong>[DA] Kayxen</strong><span>Level 4,044 &middot; Mage</span><small class="gd-role">Member</small></div></a><a class="gd-member" href="player.php?pid=134533"><img src="uploads/avatars/user_134533_1776353180.jpg" alt="" loading="lazy" width="46" height="46"><div><strong>[DA]AIexis</strong><span>Level 3,888 &middot; Hunter</span><small class="gd-role">Member</small></div></a><a class="gd-member" href="player.php?pid=119583"><img src="uploads/avatars/user_119583_1766474379.jpg" alt="" loading="lazy" width="46" height="46"><div><strong>EDO99</strong><span>Level 3,746 &middot; Hunter</span><small class="gd-role">Member</small></div></a><a class="gd-member" href="player.php?pid=151922"><img src="images/userpics/midoriya.webp" alt="" loading="lazy" width="46" height="46"><div><strong>Rahvar</strong><span>Level 3,709 &middot; Cleric</span><small class="gd-role">Member</small></div></a><a class="gd-member" href="player.php?pid=91801"><img src="uploads/avatars/user_91801_1757974552.jpg" alt="" loading="lazy" width="46" height="46"><div><strong>BaronDSamedi</strong><span>Level 3,705 &middot; Mage</span><small class="gd-role">Member</small></div></a><a class="gd-member" href="player.php?pid=151104"><img src="images/userpics/midoriya.webp" alt="" loading="lazy" width="46" height="46"><div><strong>[DA]Tekkor</strong><span>Level 3,431 &middot; Hunter</span><small class="gd-role">Member</small></div></a><a class="gd-member" href="player.php?pid=89922"><img src="uploads/avatars/user_89922_1770839658.jpg" alt="" loading="lazy" width="46" height="46"><div><strong>[DA] Umasa Lord</strong><span>Level 3,322 &middot; Mage</span><small class="gd-role">Member</small></div></a><a class="gd-member" href="player.php?pid=184240"><img src="images/userpics/midoriya.webp" alt="" loading="lazy" width="46" height="46"><div><strong>Sploft</strong><span>Level 3,279 &middot; Mage</span><small class="gd-role">Member</small></div></a><a class="gd-member" href="player.php?pid=132018"><img src="uploads/avatars/user_132018_1768656118.jpg" alt="" loading="lazy" width="46" height="46"><div><strong>[DA]end1998</strong><span>Level 3,252 &middot; Hunter</span><small class="gd-role">Member</small></div></a><a class="gd-member" href="player.php?pid=158739"><img src="images/userpics/midoriya.webp" alt="" loading="lazy" width="46" height="46"><div><strong>Mekimonsta</strong><span>Level 3,242 &middot; Warrior</span><small class="gd-role">Member</small></div></a><a class="gd-member" href="player.php?pid=108366"><img src="images/userpics/midoriya.webp" alt="" loading="lazy" width="46" height="46"><div><strong>wingsoondotcom</strong><span>Level 3,232 &middot; Hunter</span><small class="gd-role">Member</small></div></a><a class="gd-member" href="player.php?pid=120532"><img src="uploads/avatars/user_120532_1779202140.jpg" alt="" loading="lazy" width="46" height="46"><div><strong>Deliryumm</strong><span>Level 3,142 &middot; Hunter</span><small class="gd-role">Member</small></div></a><a class="gd-member" href="player.php?pid=39011"><img src="uploads/avatars/user_39011_1771323202.webp" alt="" loading="lazy" width="46" height="46"><div><strong>spiros236 </strong><span>Level 3,085 &middot; Hunter</span><small class="gd-role">Member</small></div></a><a class="gd-member" href="player.php?pid=137860"><img src="images/userpics/midoriya.webp" alt="" loading="lazy" width="46" height="46"><div><strong>elavnaj</strong><span>Level 3,049 &middot; Cleric</span><small class="gd-role">Member</small></div></a><a class="gd-member" href="player.php?pid=113583"><img src="images/userpics/midoriya.webp" alt="" loading="lazy" width="46" height="46"><div><strong>Kraiousse</strong><span>Level 3,014 &middot; Hunter</span><small class="gd-role">Member</small></div></a><a class="gd-member" href="player.php?pid=124250"><img src="images/userpics/midoriya.webp" alt="" loading="lazy" width="46" height="46"><div><strong>ragic</strong><span>Level 2,979 &middot; Mage</span><small class="gd-role">Member</small></div></a><a class="gd-member" href="player.php?pid=108359"><img src="uploads/avatars/user_108359_1774336627.jpg" alt="" loading="lazy" width="46" height="46"><div><strong>lifileon</strong><span>Level 2,867 &middot; Cleric</span><small class="gd-role">Member</small></div></a><a class="gd-member" href="player.php?pid=137607"><img src="images/userpics/midoriya.webp" alt="" loading="lazy" width="46" height="46"><div><strong>Vroud</strong><span>Level 2,830 &middot; Mage</span><small class="gd-role">Member</small></div></a><a class="gd-member" href="player.php?pid=196367"><img src="uploads/avatars/user_196367_1792665519.png" alt="" loading="lazy" width="46" height="46"><div><strong>[DA] Holy Smither</strong><span>Level 2,577 &middot; Cleric</span><small class="gd-role">Member</small></div></a><a class="gd-member" href="player.php?pid=142995"><img src="images/userpics/midoriya.webp" alt="" loading="lazy" width="46" height="46"><div><strong>vantasky</strong><span>Level 2,474 &middot; Hunter</span><small class="gd-role">Member</small></div></a><a class="gd-member" href="player.php?pid=127984"><img src="images/userpics/midoriya.webp" alt="" loading="lazy" width="46" height="46"><div><strong>Dearther2</strong><span>Level 2,323 &middot; Hunter</span><small class="gd-role">Member</small></div></a><a class="gd-member" href="player.php?pid=138739"><img src="uploads/avatars/user_138739_1786001558.webp" alt="" loading="lazy" width="46" height="46"><div><strong>[DA]Obito</strong><span>Level 2,314 &middot; Cleric</span><small class="gd-role">Member</small></div></a><a class="gd-member" href="player.php?pid=187515"><img src="images/userpics/midoriya.webp" alt="" loading="lazy" width="46" height="46"><div><strong>AkumaDark</strong><span>Level 2,289 &middot; Cleric</span><small class="gd-role">Member</small></div></a><a class="gd-member" href="player.php?pid=136469"><img src="uploads/avatars/user_136469_1783049643.jpg" alt="" loading="lazy" width="46" height="46"><div><strong>[DA] Geo1174</strong><span>Level 2,182 &middot; Cleric</span><small class="gd-role">Member</small></div></a><a class="gd-member" href="player.php?pid=141029"><img src="images/userpics/midoriya.webp" alt="" loading="lazy" width="46" height="46"><div><strong>Xiles</strong><span>Level 2,150 &middot; Hunter</span><small class="gd-role">Member</small></div></a><a class="gd-member" href="player.php?pid=141601"><img src="images/userpics/midoriya.webp" alt="" loading="lazy" width="46" height="46"><div><strong>Mazoshu </strong><span>Level 2,136 &middot; Mage</span><small class="gd-role">Member</small></div></a><a class="gd-member" href="player.php?pid=187553"><img src="images/userpics/midoriya.webp" alt="" loading="lazy" width="46" height="46"><div><strong>CHRØNØS</strong><span>Level 2,097 &middot; Mage</span><small class="gd-role">Member</small></div></a><a class="gd-member" href="player.php?pid=151362"><img src="images/userpics/midoriya.webp" alt="" loading="lazy" width="46" height="46"><div><strong>Eisenwald</strong><span>Level 2,071 &middot; Mage</span><small class="gd-role">Member</small></div></a><a class="gd-member" href="player.php?pid=135650"><img src="images/userpics/midoriya.webp" alt="" loading="lazy" width="46" height="46"><div><strong>[DA] herShie_4ever </strong><span>Level 2,006 &middot; Mage</span><small class="gd-role">Member</small></div></a><a class="gd-member" href="player.php?pid=185284"><img src="uploads/avatars/user_185284_1788531654.jpg" alt="" loading="lazy" width="46" height="46"><div><strong>afanhano</strong><span>Level 1,951 &middot; Mage</span><small class="gd-role">Member</small></div></a><a class="gd-member" href="player.php?pid=136172"><img src="images/userpics/midoriya.webp" alt="" loading="lazy" width="46" height="46"><div><strong>vinc07</strong><span>Level 1,929 &middot; Mage</span><small class="gd-role">Member</small></div></a><a class="gd-member" href="player.php?pid=183289"><img src="uploads/avatars/user_183289_1788570875.png" alt="" loading="lazy" width="46" height="46"><div><strong>[DA] Hunt007</strong><span>Level 1,919 &middot; Hunter</span><small class="gd-role">Member</small></div></a><a class="gd-member" href="player.php?pid=185282"><img src="uploads/avatars/user_185282_1788619071.png" alt="" loading="lazy" width="46" height="46"><div><strong>Remacs</strong><span>Level 1,629 &middot; Hunter</span><small class="gd-role">Member</small></div></a><a class="gd-member" href="player.php?pid=137225"><img src="images/userpics/midoriya.webp" alt="" loading="lazy" width="46" height="46"><div><strong>Hunter72</strong><span>Level 1,509 &middot; Hunter</span><small class="gd-role">Member</small></div></a></div>
+            <nav class="gd-pagination" aria-label="Member pages"><span>Page 1 of 5</span><a class="gd-button" href="guild_join_create.php?guild_id=32&amp;member_page=2">Next</a></nav>
+    </section>
+  </main><script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a5eac5ecdd2508dd',t:'MTc5NTM4MDI3Nw=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a5eac5ecdd2508dd',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"ffeb99d1cd6749e1b3504bf6b115a534","r":1,"spa":2}' crossorigin="anonymous"></script>
+</body></html>

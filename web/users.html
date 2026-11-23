@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https: http://localhost:* http://127.0.0.1:*; base-uri 'none'; form-action 'none'">
+<title>aio-farm · users</title>
+<link rel="stylesheet" href="css/base.css">
+</head>
+<body>
+<main class="shell">
+
+  <header id="siteHeader"></header>
+
+  <section class="card" id="usersCard">
+    <h2>Users <span class="sub">· owner only</span></h2>
+    <p class="hint">Each friend gets their own login. They see and control <strong>only the game
+      accounts they add</strong>; you see everything. Deleting a user can also remove their game
+      accounts (their stored passwords are destroyed) — or hand them to you via the API
+      (<code>?accounts=keep</code>).</p>
+    <div class="grid3">
+      <label>Username
+        <input id="newUser" type="text" maxlength="32" placeholder="friend-name" autocomplete="off">
+      </label>
+      <label>Password (8+ chars)
+        <input id="newUserPass" type="text" maxlength="200" placeholder="give this to them" autocomplete="off">
+      </label>
+      <div class="login-actions"><button id="btnAddUser" class="primary">Create login</button></div>
+    </div>
+    <div class="row"><span id="userMsg" class="msg"></span></div>
+    <div class="tablewrap" style="margin-top:10px">
+      <table>
+        <thead><tr><th>User</th><th>Game accounts</th><th></th></tr></thead>
+        <tbody id="userRows"><tr><td colspan="3" class="empty">no friend logins yet</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+
+</main>
+<script src="js/common.js"></script>
+<script src="js/users.js"></script>
+</body>
+</html>

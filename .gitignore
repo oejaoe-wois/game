@@ -1,0 +1,7 @@
+# runtime secrets & state — never commit
+data/
+.env
+farm.env
+tmp-test-data/
+node_modules/
+*.log

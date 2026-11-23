@@ -1,0 +1,27 @@
+{
+  "_comment": "Edit this list to add/update bosses. Fields: key (must match a cap key in server/bosses.js DEFAULT_CAPS), name (as it appears on the wave page, matched case-insensitively), wave (active_wave.php query), phase (3 only for duel-phase bosses). Restart the server after editing.",
+  "bosses": [
+    { "id": 1,  "key": "gen",  "name": "general skarn the radiant bastion",          "wave": "gate=3&wave=8" },
+    { "id": 2,  "key": "gen",  "name": "general vessir the sunfang duelist",         "wave": "gate=3&wave=8" },
+    { "id": 3,  "key": "gen",  "name": "general hrazz the dawnflame oathkeeper",     "wave": "gate=3&wave=8" },
+    { "id": 4,  "key": "gen",  "name": "drakzareth the tyrant lizard king",          "wave": "gate=3&wave=8" },
+    { "id": 5,  "key": "oce",  "name": "oceanus the water titan",                    "wave": "gate=5&wave=9" },
+    { "id": 10, "key": "pos",  "name": "poseidon, the sea emperor",                  "wave": "gate=5&wave=9" },
+    { "id": 6,  "key": "pan",  "name": "pan, wild herald of hermes",                 "wave": "gate=5&wave=10" },
+    { "id": 7,  "key": "her",  "name": "Hermes, Divine Herald of the Endless Road",    "wave": "gate=5&wave=10", "phase": 3 },
+    { "id": 8,  "key": "ori",  "name": "orion, eternal hunter of artemis",           "wave": "gate=5&wave=11" },
+    { "id": 9,  "key": "art",  "name": "Artemis, Lunar Duelist of the Sacred Hunt",  "wave": "gate=5&wave=11", "phase": 3 },
+    { "id": 11, "key": "tri",  "name": "triton, herald of the deep crown",           "wave": "gate=5&wave=12" },
+    { "id": 12, "key": "psd",  "name": "Poseidon, Sovereign of the Drowned Steps",     "wave": "gate=5&wave=12", "phase": 3 },
+    { "id": 13, "key": "dei",  "name": "deimos, herald of panic",                    "wave": "gate=5&wave=13" },
+    { "id": 14, "key": "are",  "name": "Ares, Sovereign of the Red Bastion",           "wave": "gate=5&wave=13", "phase": 3 },
+    { "id": 15, "key": "asc",  "name": "asclepius, herald of golden mercy",          "wave": "gate=5&wave=14" },
+    { "id": 16, "key": "apo",  "name": "Apollo, Duelist of the Sun Court",           "wave": "gate=5&wave=14", "phase": 3 },
+    { "id": 19, "key": "nike", "name": "Nike, Herald of Unbroken Victory",           "wave": "gate=5&wave=15" },
+    { "id": 18, "key": "ath",  "name": "Athena, Sovereign of the Ivory War Library",  "wave": "gate=5&wave=15", "phase": 3 },
+    { "id": 17, "key": "nem",  "name": "Nemesis, Herald of Reckoning",               "wave": "gate=5&wave=16" },
+    { "id": 20, "key": "hera", "name": "Hera, Sovereign of the Crown Court",           "wave": "gate=5&wave=16", "phase": 3 },
+    { "id": 21, "key": "aeo",  "name": "Aeolus, Herald of Bound Winds",              "wave": "gate=5&wave=17" },
+    { "id": 22, "key": "zeus", "name": "Zeus, Sovereign of the Storm Throne",          "wave": "gate=5&wave=17", "phase": 3 }
+  ]
+}

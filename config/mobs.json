@@ -1,0 +1,123 @@
+{
+  "_comment": "Wave rosters: the mob names each registry page hosts, live-scraped 2026-11 from active_wave.php (Grakthar 3 waves, Olympus wave 1, the eight domains). This is the hunt map's SEED (hunt.js): Divers and guild kill contracts go straight to a wave the map pins instead of round-robin-discovering it. Seeded names never overwrite a live-learned row (data/hunt-map.json wins), and every parsed wave page keeps the map fresh. Boss names ride along so dive targets like 'drakzareth' pin the boss wave too. Event waves (event=N&wave=M) rotate — the scout teaches them at sweep time, no need to list them here. Edit freely — restart the server after.",
+  "rosters": {
+    "gate=3&wave=3": [
+      "Goblin Skirmisher",
+      "Goblin Slinger",
+      "Orc Grunt",
+      "Orc Bonecrusher",
+      "Hobgoblin Spearman"
+    ],
+    "gate=3&wave=5": [
+      "Troll Ravager",
+      "Troll Brawler",
+      "Lizardman Flamecaster",
+      "Lizardman Shadowclaw"
+    ],
+    "gate=3&wave=8": [
+      "Lizardman Vanguard",
+      "Lizardman Warmage",
+      "Lizardman Dreadblade",
+      "Lizardman Juggernaut",
+      "Lizardman Bloodpriest",
+      "Lizardman Guardian",
+      "General Skarn the Radiant Bastion",
+      "General Vessir the Sunfang Duelist",
+      "General Hrazz the Dawnflame Oathkeeper",
+      "Drakzareth the Tyrant Lizard King"
+    ],
+    "gate=5&wave=9": [
+      "Charybdis, Living Maelstrom",
+      "The Crab King",
+      "Dark Siren",
+      "Scylla, Devourer of Sailors",
+      "Kraken",
+      "Merfolk",
+      "Deep Sea Beast",
+      "Triton Warrior",
+      "Water Nymph",
+      "Oceanus The Water Titan",
+      "Poseidon, The Sea Emperor"
+    ],
+    "gate=5&wave=10": [
+      "Winged Courier",
+      "Gilded Trickster",
+      "Roadside Bandit",
+      "Caduceus Acolyte",
+      "Silver Sandal Runner",
+      "Market Shadow",
+      "Pan, Wild Herald of Hermes",
+      "Hermes, Divine Herald of the Endless Road"
+    ],
+    "gate=5&wave=11": [
+      "Moonlit Huntress",
+      "Silver Stag Guardian",
+      "Lunar Wolf",
+      "Forest Nymph Archer",
+      "Sacred Bear",
+      "Twilight Tracker",
+      "Orion, Eternal Hunter of Artemis",
+      "Artemis, Lunar Duelist of the Sacred Hunt"
+    ],
+    "gate=5&wave=12": [
+      "Abyssal Hoplite",
+      "Tideglass Magus",
+      "Coral Gorgon",
+      "Maelstrom Cavalier",
+      "Trenchborn Oracle",
+      "Leviathan Warden",
+      "Triton, Herald of the Deep Crown",
+      "Poseidon, Sovereign of the Drowned Steps"
+    ],
+    "gate=5&wave=13": [
+      "Bronze Legionnaire",
+      "Blood-Oath Myrmidon",
+      "Warhound of Enyo",
+      "Spearwall Hoplite",
+      "Ashen Chariot Raider",
+      "Fury-Touched Champion",
+      "Deimos, Herald of Panic",
+      "Ares, Sovereign of the Red Bastion"
+    ],
+    "gate=5&wave=14": [
+      "Dawn Choir Acolyte",
+      "Sun-Lance Centaur",
+      "Laurel Flamekeeper",
+      "Golden Lyrist",
+      "Radiant Python",
+      "Basilica Exorcist",
+      "Asclepius, Herald of Golden Mercy",
+      "Apollo, Duelist of the Sun Court"
+    ],
+    "gate=5&wave=15": [
+      "Owl-Eyed Scribe",
+      "Aegis Hoplite",
+      "Bronze Automaton",
+      "Gorgon-Sigil Warden",
+      "Strategy Shade",
+      "Ivory Spearmaster",
+      "Nike, Herald of Unbroken Victory",
+      "Athena, Sovereign of the Ivory War Library"
+    ],
+    "gate=5&wave=16": [
+      "Peacock Sentinel",
+      "Oathbound Judge",
+      "Crowned Handmaiden",
+      "Vowbreaker Shade",
+      "Argive Lion",
+      "Royal Scepter Mage",
+      "Nemesis, Herald of Reckoning",
+      "Hera, Sovereign of the Crown Court"
+    ],
+    "gate=5&wave=17": [
+      "Thundercloud Harpy",
+      "Aetheric Cyclops",
+      "Storm Eagle",
+      "Lightning Hoplite",
+      "Oracle of Dodona",
+      "Skyfire Giant",
+      "Aeolus, Herald of Bound Winds",
+      "Zeus, Sovereign of the Storm Throne"
+    ]
+  }
+}

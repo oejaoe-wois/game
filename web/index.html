@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https: http://localhost:* http://127.0.0.1:*; base-uri 'none'; form-action 'none'">
+<title>aio-farm · sign in</title>
+<link rel="stylesheet" href="css/base.css">
+</head>
+<body>
+<main class="center-shell">
+
+  <header class="big-brand">
+    <div class="brand-mark">▲</div>
+    <h1>aio-farm</h1>
+    <p>shared-target multi-account orchestrator · server-side containers</p>
+  </header>
+
+  <section class="card">
+    <h2>Sign in</h2>
+    <p class="hint">Log in with <strong>your own username and password</strong> — you only see and
+      control the game accounts you added yourself. (Ask the farm owner for a login.) Credentials are
+      checked by the server and exchanged for a session token that is stored <strong>only in this
+      browser</strong> (localStorage) — the panel repo holds zero secrets.</p>
+    <label style="margin-bottom:12px">Server URL
+      <input id="serverUrl" type="url" placeholder="https://your-server.example.net" autocomplete="off">
+    </label>
+    <div class="grid2" style="margin-bottom:12px">
+      <label>Username
+        <input id="loginUser" type="text" placeholder="your username" autocomplete="username">
+      </label>
+      <label>Password
+        <div class="pwwrap">
+          <input id="loginPass" type="password" placeholder="••••••••" autocomplete="current-password">
+          <button type="button" class="ghost" id="toggleLoginPass">show</button>
+        </div>
+      </label>
+    </div>
+    <div class="row" style="margin-top:4px">
+      <button id="btnLogin" class="primary">Sign in</button>
+      <span id="loginMsg" class="msg"></span>
+    </div>
+  </section>
+
+  <footer>
+    <p><strong>How the isolation works:</strong> every account runs as its own cookie-jar container on
+      the farm server — separate sessions, parallel loops, one shared target bus. The game sees N normal sessions.</p>
+    <p><strong>Risk note:</strong> game automation typically violates the game's terms of service;
+      accounts farmed here can be banned. Keep <code>JITTER_SCALE</code> conservative.</p>
+  </footer>
+
+</main>
+<script src="js/common.js"></script>
+<script src="js/login.js"></script>
+</body>
+</html>
